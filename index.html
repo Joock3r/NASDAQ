@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בורסת הילדים 💰</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --card: #151e2e;
+  --card2: #1c2840;
+  --border: #2a3a55;
+  --accent: #00e5ff;
+  --accent2: #7c3aed;
+  --green: #00ff88;
+  --red: #ff3366;
+  --yellow: #ffd700;
+  --orange: #ff8c00;
+  --text: #e8f0fe;
+  --text2: #8899bb;
+  --text3: #4a5a7a;
+  --glow: 0 0 20px rgba(0,229,255,0.3);
+  --glow-g: 0 0 20px rgba(0,255,136,0.3);
+  --glow-r: 0 0 20px rgba(255,51,102,0.3);
+  --radius: 16px;
+  --radius-sm: 10px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: 'Heebo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* BACKGROUND GRID */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ====== SCREENS ====== */
+.screen { display: none; position: relative; z-index: 1; animation: fadeIn 0.4s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ====== SETUP SCREEN ====== */
+#setup-screen {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 30px 20px;
+}
+.logo {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.logo h1 {
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent), var(--accent2), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+}
+.logo p { color: var(--text2); font-size: 1.1rem; margin-top: 8px; }
+
+.setup-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+.input-group { margin-bottom: 20px; }
+.input-group label { display: block; font-size: 0.9rem; color: var(--text2); margin-bottom: 8px; font-weight: 500; }
+.input-group input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: right;
+}
+.input-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.1);
+}
+
+.players-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.player-row {
+  display: flex; gap: 10px; align-items: center;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.player-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-size: 1rem;
+  text-align: right;
+}
+.player-row input:focus { outline: none; }
+.avatar-select { font-size: 1.5rem; cursor: pointer; background: none; border: none; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  border: none; cursor: pointer;
+  font-family: 'Heebo', sans-serif;
+  font-size: 1rem; font-weight: 700;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #0099bb);
+  color: #000;
+  box-shadow: 0 4px 20px rgba(0,229,255,0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,229,255,0.4); }
+.btn-secondary {
+  background: var(--bg3);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: rgba(255,51,102,0.15); color: var(--red); border: 1px solid rgba(255,51,102,0.3); }
+.btn-danger:hover { background: rgba(255,51,102,0.25); }
+.btn-success { background: linear-gradient(135deg, var(--green), #00aa55); color: #000; box-shadow: 0 4px 20px rgba(0,255,136,0.3); }
+.btn-success:hover { transform: translateY(-2px); }
+.btn-sm { padding: 8px 16px; font-size: 0.85rem; }
+.btn-icon { width: 36px; height: 36px; padding: 0; border-radius: 50%; font-size: 1.1rem; background: rgba(255,51,102,0.15); color: var(--red); border: 1px solid rgba(255,51,102,0.3); }
+.btn-icon:hover { background: rgba(255,51,102,0.3); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; }
+
+.flex { display: flex; }
+.flex-center { align-items: center; justify-content: center; }
+.gap-10 { gap: 10px; }
+.gap-16 { gap: 16px; }
+.full-w { width: 100%; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* ====== GAME SCREEN ====== */
+#game-screen { min-height: 100vh; }
+
+.game-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(10px);
+}
+.game-title { font-weight: 800; font-size: 1.2rem; color: var(--accent); }
+.day-badge {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  color: var(--text2);
+}
+.day-badge span { color: var(--yellow); font-weight: 700; font-family: 'Space Mono', monospace; }
+
+/* PLAYER TABS */
+.player-tabs {
+  display: flex; gap: 0;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  padding: 0 16px;
+}
+.player-tab {
+  padding: 14px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text2);
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.player-tab:hover { color: var(--text); }
+.player-tab.active {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+}
+.player-tab .tab-value {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+  background: var(--bg3);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.tab-done { font-size: 0.8rem; color: var(--green) !important; }
+
+/* GAME MAIN */
+.game-main {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  min-height: calc(100vh - 110px);
+}
+@media (max-width: 900px) {
+  .game-main { grid-template-columns: 1fr; }
+  .sidebar { border-left: none; border-bottom: 1px solid var(--border); }
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: var(--card);
+  border-left: 1px solid var(--border);
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.player-profile {
+  text-align: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.player-avatar { font-size: 3rem; margin-bottom: 8px; }
+.player-name-big { font-size: 1.3rem; font-weight: 800; }
+.player-cash {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--green);
+  margin: 4px 0;
+}
+.player-cash-label { font-size: 0.75rem; color: var(--text2); }
+
+.stat-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg3);
+  font-size: 0.85rem;
+}
+.stat-label { color: var(--text2); }
+.stat-val { font-family: 'Space Mono', monospace; font-weight: 700; }
+.stat-val.green { color: var(--green); }
+.stat-val.red { color: var(--red); }
+.stat-val.yellow { color: var(--yellow); }
+
+/* DIVERSIFICATION METER */
+.div-meter-wrap { margin-top: 20px; }
+.div-meter-bar {
+  height: 8px;
+  background: var(--bg3);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.div-meter-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ACTIONS PANEL */
+.sidebar-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+/* QUEST CARD */
+.quest-card {
+  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(124,58,237,0.05));
+  border: 1px solid rgba(124,58,237,0.4);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  margin-top: 16px;
+}
+.quest-title { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: var(--accent2); margin-bottom: 6px; font-weight: 700; }
+.quest-desc { font-size: 0.85rem; color: var(--text); margin-bottom: 8px; }
+.quest-reward { font-size: 0.8rem; color: var(--yellow); }
+
+/* NEWS TICKER */
+.news-ticker-wrap {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 16px;
+  overflow: hidden;
+  position: relative;
+}
+.news-ticker {
+  display: flex; gap: 40px;
+  animation: ticker 30s linear infinite;
+  white-space: nowrap;
+}
+@keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.news-item { font-size: 0.8rem; color: var(--text2); }
+.news-item .tag { color: var(--accent); font-weight: 700; margin-left: 6px; }
+.news-item .up { color: var(--green); }
+.news-item .down { color: var(--red); }
+
+/* MARKET GRID */
+.market-area { padding: 20px; overflow-y: auto; }
+.market-search {
+  display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+}
+.market-search input {
+  flex: 1; min-width: 180px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text);
+  font-family: 'Heebo', sans-serif;
+  font-size: 0.9rem;
+  text-align: right;
+}
+.market-search input:focus { outline: none; border-color: var(--accent); }
+
+.filter-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  cursor: pointer;
+  background: var(--bg2);
+  color: var(--text2);
+  transition: all 0.2s;
+}
+.pill.active { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 700; }
+.pill:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+
+.stocks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+/* STOCK CARD */
+.stock-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.stock-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.stock-card:hover { border-color: var(--accent); transform: translateY(-3px); box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+.stock-card:hover::before { opacity: 1; }
+.stock-card.owned { border-color: rgba(0,255,136,0.4); }
+.stock-card.owned::before { opacity: 1; background: linear-gradient(90deg, transparent, var(--green), transparent); }
+
+.stock-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.stock-emoji { font-size: 2rem; }
+.stock-name { font-weight: 800; font-size: 0.95rem; margin-bottom: 2px; }
+.stock-category { font-size: 0.7rem; color: var(--text2); }
+.stock-risk {
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.risk-stable { background: rgba(0,255,136,0.15); color: var(--green); }
+.risk-volatile { background: rgba(255,140,0,0.15); color: var(--orange); }
+.risk-very-volatile { background: rgba(255,51,102,0.15); color: var(--red); }
+
+.stock-price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.stock-price {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.stock-change {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+.change-up { background: rgba(0,255,136,0.15); color: var(--green); }
+.change-down { background: rgba(255,51,102,0.15); color: var(--red); }
+.change-neutral { background: rgba(255,215,0,0.1); color: var(--yellow); }
+
+.mini-chart { height: 40px; position: relative; margin-bottom: 10px; }
+.mini-chart canvas { width: 100% !important; height: 40px !important; }
+
+.stock-owned-badge {
+  font-size: 0.75rem;
+  color: var(--green);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 4px;
+}
+
+.stock-actions { display: flex; gap: 8px; }
+.buy-btn {
+  flex: 1; padding: 8px;
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.3);
+  border-radius: 8px;
+  color: var(--green);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 700; font-size: 0.85rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.buy-btn:hover { background: rgba(0,255,136,0.2); }
+.sell-btn {
+  flex: 1; padding: 8px;
+  background: rgba(255,51,102,0.1);
+  border: 1px solid rgba(255,51,102,0.3);
+  border-radius: 8px;
+  color: var(--red);
+  font-family: 'Heebo', sans-serif;
+  font-weight: 700; font-size: 0.85rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.sell-btn:hover { background: rgba(255,51,102,0.2); }
+.sell-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+/* FLASH ANIMATIONS */
+@keyframes flashGreen { 0%, 100% { background: var(--card); } 50% { background: rgba(0,255,136,0.2); } }
+@keyframes flashRed { 0%, 100% { background: var(--card); } 50% { background: rgba(255,51,102,0.2); } }
+.flash-green { animation: flashGreen 0.6s ease; }
+.flash-red { animation: flashRed 0.6s ease; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px;
+  max-width: 500px; width: 100%;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+  animation: modalIn 0.3s ease;
+  max-height: 90vh; overflow-y: auto;
+}
+@keyframes modalIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+.modal h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+.modal-info { background: var(--bg2); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px; }
+.modal-info .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--bg3); font-size: 0.9rem; }
+.modal-info .row:last-child { border: none; }
+
+.qty-control { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+.qty-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: var(--bg3); border: 1px solid var(--border);
+  color: var(--text); font-size: 1.2rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.qty-btn:hover { border-color: var(--accent); color: var(--accent); }
+.qty-display {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.5rem; font-weight: 700;
+  flex: 1; text-align: center;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px;
+}
+.total-cost {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.1rem; font-weight: 700;
+  text-align: center;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+}
+.tax-notice {
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  color: var(--yellow);
+  margin-bottom: 16px;
+}
+
+/* ROUND SUMMARY */
+#summary-screen { min-height: 100vh; padding: 30px 20px; max-width: 900px; margin: 0 auto; }
+.summary-header { text-align: center; margin-bottom: 30px; }
+.summary-header h1 { font-size: 2rem; font-weight: 900; }
+.summary-header p { color: var(--text2); margin-top: 6px; }
+
+.news-event-cards { display: flex; flex-direction: column; gap: 12px; margin-bottom: 30px; }
+.news-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  display: flex; align-items: center; gap: 16px;
+}
+.news-card .news-icon { font-size: 2rem; }
+.news-card .news-body { flex: 1; }
+.news-card .news-headline { font-weight: 700; margin-bottom: 4px; }
+.news-card .news-effect { font-size: 0.85rem; color: var(--text2); }
+.news-card .news-pct { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 1.1rem; }
+
+.players-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+.player-summary-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.player-summary-card.mvp {
+  border-color: var(--yellow);
+  box-shadow: 0 0 30px rgba(255,215,0,0.2);
+}
+.mvp-badge {
+  position: absolute; top: 12px; left: 12px;
+  background: var(--yellow);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+}
+.ps-avatar { font-size: 2.5rem; margin-bottom: 8px; }
+.ps-name { font-size: 1.1rem; font-weight: 800; margin-bottom: 4px; }
+.ps-total {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.4rem; font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.ps-change {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.9rem; font-weight: 700;
+  padding: 4px 10px; border-radius: 8px;
+  display: inline-block; margin-bottom: 12px;
+}
+
+.actions-log { list-style: none; }
+.action-item {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--bg3);
+  font-size: 0.8rem;
+  color: var(--text2);
+  display: flex; justify-content: space-between;
+}
+.action-item:last-child { border: none; }
+.action-item .alist-label { }
+.action-item .alist-val { font-family: 'Space Mono', monospace; font-size: 0.75rem; }
+
+.fomo-tag {
+  margin-top: 10px;
+  background: rgba(255,140,0,0.15);
+  border: 1px solid rgba(255,140,0,0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  color: var(--orange);
+}
+
+.leaderboard-section { margin-bottom: 30px; }
+.leaderboard-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+.leaderboard-row:hover { border-color: var(--accent); }
+.rank-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--text3);
+  width: 30px; text-align: center;
+}
+.rank-num.gold { color: var(--yellow); }
+.rank-num.silver { color: #aaa; }
+.rank-num.bronze { color: #cd7f32; }
+.lb-av { font-size: 1.8rem; }
+.lb-name { font-weight: 700; flex: 1; }
+.lb-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 1rem; font-weight: 700;
+}
+
+/* BANK / LOAN / INSURANCE / NEWS-SUB MODALS */
+.feature-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.feature-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.feature-card:hover { border-color: var(--accent); }
+.feature-card .fc-icon { font-size: 2rem; margin-bottom: 6px; }
+.feature-card .fc-title { font-weight: 700; font-size: 0.9rem; }
+.feature-card .fc-desc { font-size: 0.75rem; color: var(--text2); margin-top: 4px; }
+
+/* TOAST */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+  max-width: 400px;
+  text-align: center;
+}
+.toast.green { border-color: rgba(0,255,136,0.5); color: var(--green); }
+.toast.red { border-color: rgba(255,51,102,0.5); color: var(--red); }
+.toast.yellow { border-color: rgba(255,215,0,0.5); color: var(--yellow); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toastOut { to { opacity: 0; transform: translateY(-10px); } }
+
+/* PORTFOLIO TABLE IN SIDEBAR */
+.portfolio-list { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+.port-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 0.8rem;
+}
+.port-item-top { display: flex; justify-content: space-between; font-weight: 700; }
+.port-item-bot { display: flex; justify-content: space-between; margin-top: 2px; color: var(--text2); }
+
+/* BANK SAVINGS */
+.savings-card {
+  background: linear-gradient(135deg, rgba(0,229,255,0.1), rgba(0,229,255,0.03));
+  border: 1px solid rgba(0,229,255,0.3);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  margin-top: 10px;
+}
+.savings-label { font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; font-weight: 700; }
+.savings-amount { font-family: 'Space Mono', monospace; font-size: 1.2rem; font-weight: 700; color: var(--accent); }
+.savings-info { font-size: 0.75rem; color: var(--text2); margin-top: 2px; }
+
+/* INSURANCE / LOAN badges */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.badge-green { background: rgba(0,255,136,0.15); color: var(--green); }
+.badge-red { background: rgba(255,51,102,0.15); color: var(--red); }
+.badge-yellow { background: rgba(255,215,0,0.15); color: var(--yellow); }
+.badge-blue { background: rgba(0,229,255,0.15); color: var(--accent); }
+
+/* END GAME */
+#end-screen {
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+}
+.winner-trophy { font-size: 6rem; animation: bounce 1s ease infinite alternate; }
+@keyframes bounce { to { transform: translateY(-15px); } }
+#end-screen h1 { font-size: 2.5rem; font-weight: 900; margin: 20px 0 10px; }
+#end-screen p { color: var(--text2); font-size: 1.1rem; margin-bottom: 30px; }
+
+/* SCROLLABLE end leaderboard */
+.end-leaderboard { width: 100%; max-width: 500px; }
+
+/* MISC */
+hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.text-center { text-align: center; }
+.text-muted { color: var(--text2); font-size: 0.85rem; }
+.mono { font-family: 'Space Mono', monospace; }
+.tag { display: inline-block; font-size: 0.65rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }
+.tag-cat { background: rgba(124,58,237,0.2); color: #a78bfa; }
+
+/* LOGO IMAGE in stock card */
+.stock-logo-img {
+  width: 48px; height: 48px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: var(--bg2);
+  padding: 4px;
+  border: 1px solid var(--border);
+}
+.logo-manager-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 4px;
+}
+.logo-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.logo-item:hover { border-color: var(--accent); }
+.logo-item .logo-preview { font-size: 2rem; margin-bottom: 4px; }
+.logo-item .logo-preview img { width: 40px; height: 40px; object-fit: contain; border-radius: 6px; }
+.logo-item .logo-name { font-size: 0.75rem; font-weight: 700; margin-bottom: 6px; color: var(--text2); }
+.logo-upload-hint { font-size: 0.65rem; color: var(--text3); }
+</style>
+</head>
+<body>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- ===================== SETUP SCREEN ===================== -->
+<div id="setup-screen" class="screen active">
+  <div class="logo">
+    <h1>💹 בורסת הילדים</h1>
+    <p>למד להשקיע, לנהל כסף, ולהתעשר! 🚀</p>
+  </div>
+  <div class="setup-card">
+    <div class="section-title">⚙️ הגדרות משחק</div>
+    <div class="input-group">
+      <label>כמות כסף התחלתית לכל שחקן (₪)</label>
+      <input type="number" id="start-cash" value="10000" min="1000" max="100000" step="1000">
+    </div>
+    <div class="input-group">
+      <label>מספר סיבובים (ימי עסקים)</label>
+      <input type="number" id="num-rounds" value="10" min="3" max="30">
+    </div>
+    <hr class="divider">
+    <div class="section-title">👥 שחקנים</div>
+    <div class="players-list" id="players-list"></div>
+    <button class="btn btn-secondary btn-sm" onclick="addPlayer()">➕ הוסף שחקן</button>
+    <hr class="divider">
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-primary full-w" onclick="startGame()" id="start-btn">🚀 התחל משחק!</button>
+      <button class="btn btn-secondary btn-sm" onclick="loadGame()" id="load-btn" style="display:none">📂 המשך משחק שמור</button>
+    </div>
+    <button class="btn btn-danger btn-sm mt-16 full-w" onclick="resetSave()" id="reset-btn" style="display:none">🗑️ מחק שמירה</button>
+    <button class="btn btn-secondary btn-sm mt-16 full-w" onclick="openLogoManager()">🖼️ ניהול לוגואים לחברות</button>
+  </div>
+</div>
+
+<!-- ===================== GAME SCREEN ===================== -->
+<div id="game-screen" class="screen">
+  <div class="game-header">
+    <div class="game-title">💹 בורסת הילדים</div>
+    <div id="header-player-cash" style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:0.9rem">
+      <span id="header-player-avatar" style="font-size:1.2rem"></span>
+      <span id="header-player-name" style="color:var(--text2);font-weight:600"></span>
+      <span style="color:var(--text3)">|</span>
+      <span style="color:var(--text2);font-size:0.8rem">מזומן:</span>
+      <span id="header-cash-value" style="font-family:'Space Mono',monospace;font-weight:700;color:var(--green)"></span>
+    </div>
+    <div class="day-badge">יום עסקים: <span id="current-day-label">1</span></div>
+    <button class="btn btn-secondary btn-sm" onclick="endTurn()">✅ סיים תור</button>
+  </div>
+  <div class="news-ticker-wrap">
+    <div class="news-ticker" id="news-ticker">
+      <span class="news-item">⏳ טוען חדשות...</span>
+    </div>
+  </div>
+  <div class="player-tabs" id="player-tabs"></div>
+  <div class="game-main">
+    <!-- SIDEBAR -->
+    <div class="sidebar" id="sidebar">
+      <div class="player-profile" id="player-profile"></div>
+      <div id="portfolio-section"></div>
+      <div id="sidebar-features"></div>
+      <div id="quest-section"></div>
+      <div class="sidebar-actions" id="sidebar-actions"></div>
+    </div>
+    <!-- MARKET -->
+    <div class="market-area">
+      <div class="market-search">
+        <input type="text" id="search-input" placeholder="🔍 חפש חברה..." oninput="filterStocks()">
+        <div class="filter-pills" id="filter-pills"></div>
+      </div>
+      <div class="stocks-grid" id="stocks-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SUMMARY SCREEN ===================== -->
+<div id="summary-screen" class="screen">
+  <div class="summary-header">
+    <h1 id="summary-title">📰 סיכום יום עסקים</h1>
+    <p id="summary-subtitle"></p>
+  </div>
+  <div class="section-title">📰 אירועי שוק היום</div>
+  <div class="news-event-cards" id="summary-news"></div>
+  <hr class="divider">
+  <div class="section-title">🏆 טבלת מובילים</div>
+  <div class="leaderboard-section" id="leaderboard"></div>
+  <hr class="divider">
+  <div class="section-title">👤 סיכום שחקנים</div>
+  <div class="players-summary-grid" id="players-summary"></div>
+  <div class="text-center mt-16 mb-16">
+    <button class="btn btn-primary" style="font-size:1.1rem; padding:16px 40px;" id="next-day-btn" onclick="nextDay()">
+      ☀️ עבור ליום העסקים הבא
+    </button>
+  </div>
+</div>
+
+<!-- ===================== END SCREEN ===================== -->
+<div id="end-screen" class="screen">
+  <div class="winner-trophy" id="winner-trophy">🏆</div>
+  <h1 id="end-title">המשחק הסתיים!</h1>
+  <p id="end-subtitle"></p>
+  <div class="end-leaderboard" id="end-leaderboard"></div>
+  <button class="btn btn-primary mt-16" onclick="goToSetup()">🔄 משחק חדש</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ============================================================
+// DATA: 30 COMPANIES
+// ============================================================
+const COMPANIES = [
+  // SNACKS/FOOD
+  { id:'strauss', name:'שטראוס', emoji:'🍫', category:'מזון', risk:'stable', basePrice:85, desc:'מילקי וטפוצ׳יפס!' },
+  { id:'osem', name:'אסם', emoji:'🥜', category:'מזון', risk:'stable', basePrice:72, desc:'במבה וגם ביסלי!' },
+  { id:'elite', name:'עלית', emoji:'🍩', category:'מזון', risk:'stable', basePrice:60, desc:'שוקולד פרה האגדי' },
+  { id:'tnuva', name:'תנובה', emoji:'🥛', category:'מזון', risk:'stable', basePrice:95, desc:'חלב ומוצרי חלב' },
+  { id:'cocacola', name:'קוקה קולה', emoji:'🥤', category:'מזון', risk:'stable', basePrice:120, desc:'המשקה הכי מפורסם' },
+  { id:'mcdonalds', name:'מקדונלד׳ס', emoji:'🍔', category:'מזון', risk:'stable', basePrice:180, desc:'ביג מק לכולם!' },
+  { id:'golda', name:'גולדה', emoji:'🍦', category:'מזון', risk:'volatile', basePrice:45, desc:'גלידה ישראלית!' },
+  // TOYS/PLAY
+  { id:'lego', name:'לגו', emoji:'🧱', category:'צעצועים', risk:'stable', basePrice:140, desc:'לבנות עולמות!' },
+  { id:'playmobil', name:'פליימוביל', emoji:'🎭', category:'צעצועים', risk:'stable', basePrice:90, desc:'דמויות וסיפורים' },
+  { id:'nintendo', name:'נינטנדו', emoji:'🎮', category:'צעצועים', risk:'volatile', basePrice:200, desc:'מריו וזלדה!' },
+  { id:'playstation', name:'פלייסטיישן', emoji:'🕹️', category:'צעצועים', risk:'volatile', basePrice:220, desc:'סוני גיימינג!' },
+  { id:'disney', name:'דיסני', emoji:'🏰', category:'צעצועים', risk:'stable', basePrice:160, desc:'אנימציה וקסם' },
+  { id:'hapirat', name:'הפיראט האדום', emoji:'🏴‍☠️', category:'צעצועים', risk:'volatile', basePrice:35, desc:'ספינת הצעצועים!' },
+  // TECH/MEDIA
+  { id:'apple', name:'אפל', emoji:'🍎', category:'טכנולוגיה', risk:'stable', basePrice:380, desc:'אייפון ומק!' },
+  { id:'google', name:'גוגל/יוטיוב', emoji:'🔴', category:'טכנולוגיה', risk:'stable', basePrice:310, desc:'חיפוש ויוטיוב' },
+  { id:'netflix', name:'נטפליקס', emoji:'🎬', category:'טכנולוגיה', risk:'volatile', basePrice:250, desc:'סרטים וסדרות!' },
+  { id:'fortnite', name:'פורטנייט', emoji:'🎯', category:'טכנולוגיה', risk:'very-volatile', basePrice:80, desc:'בטל גיימינג!' },
+  { id:'roblox', name:'רובלוקס', emoji:'🟥', category:'טכנולוגיה', risk:'very-volatile', basePrice:55, desc:'עולם וירטואלי!' },
+  // CLOTHING/LIFESTYLE
+  { id:'nike', name:'נייקי', emoji:'👟', category:'אופנה', risk:'stable', basePrice:175, desc:'Just Do It!' },
+  { id:'adidas', name:'אדידס', emoji:'⚽', category:'אופנה', risk:'stable', basePrice:165, desc:'שלושה פסים!' },
+  { id:'castro', name:'קסטרו', emoji:'👗', category:'אופנה', risk:'volatile', basePrice:68, desc:'אופנה ישראלית' },
+  { id:'fox', name:'פוקס', emoji:'🦊', category:'אופנה', risk:'volatile', basePrice:52, desc:'בגדים לכולם!' },
+  // DAILY/FAMILY
+  { id:'superpharm', name:'סופר-פארם', emoji:'💊', category:'יומיומי', risk:'stable', basePrice:110, desc:'בריאות ויופי' },
+  { id:'shufersal', name:'שופרסל', emoji:'🛒', category:'יומיומי', risk:'stable', basePrice:88, desc:'הסופר שלנו!' },
+  { id:'elal', name:'אל-על', emoji:'✈️', category:'יומיומי', risk:'volatile', basePrice:145, desc:'טיסות לחו"ל!' },
+  { id:'ravkav', name:'רב-קו', emoji:'🚌', category:'יומיומי', risk:'stable', basePrice:42, desc:'תחבורה ציבורית' },
+  { id:'cellcom', name:'סלקום', emoji:'📱', category:'יומיומי', risk:'volatile', basePrice:78, desc:'סלולר ואינטרנט' },
+  { id:'specialized', name:'ספשיאלייזד', emoji:'🚴', category:'יומיומי', risk:'volatile', basePrice:195, desc:'אופניים פרימיום!' },
+  { id:'delek', name:'דלק', emoji:'⛽', category:'יומיומי', risk:'volatile', basePrice:130, desc:'דלק ואנרגיה' },
+  { id:'minecraft', name:'מיינקראפט', emoji:'⛏️', category:'טכנולוגיה', risk:'volatile', basePrice:65, desc:'בנייה ויצירה!' },
+];
+
+const CATEGORIES = ['הכל','מזון','צעצועים','טכנולוגיה','אופנה','יומיומי'];
+
+const NEWS_EVENTS = [
+  { headline:'🚀 אפל מכריזה על אייפון חדש מדהים!', company:'apple', effect:0.12, icon:'📱' },
+  { headline:'😱 קריסת שרתים עולמית ברובלוקס!', company:'roblox', effect:-0.20, icon:'🔴' },
+  { headline:'🍫 עלית משיקה שוקולד בטעם גבינה!', company:'elite', effect:0.15, icon:'🧀' },
+  { headline:'🎮 נינטנדו מפרסמת משחק חדש של מריו!', company:'nintendo', effect:0.18, icon:'⭐' },
+  { headline:'🔥 פורטנייט מפסיד שחקנים לרובלוקס', company:'fortnite', effect:-0.15, icon:'😬' },
+  { headline:'✈️ אל-על מוסיפה נסיעות לטוקיו!', company:'elal', effect:0.10, icon:'🗾' },
+  { headline:'📉 גוגל מאבד פרסומות לטיקטוק', company:'google', effect:-0.08, icon:'📉' },
+  { headline:'🏆 ניקה חותמת עם שחקן כדורגל-על!', company:'nike', effect:0.14, icon:'⚽' },
+  { headline:'🌡️ גל חום - גלידת גולדה נמכרת כמו חמה!', company:'golda', effect:0.25, icon:'☀️' },
+  { headline:'🥜 מחסור בארצישים - מחיר הבמבה קפץ!', company:'osem', effect:0.16, icon:'📈' },
+  { headline:'💊 סופר-פארם פותחת 20 סניפים חדשים', company:'superpharm', effect:0.09, icon:'🏪' },
+  { headline:'⛽ מחיר הנפט עולה - דלק בעיות!', company:'delek', effect:-0.12, icon:'💸' },
+  { headline:'🛒 שופרסל משיקה אפליקציה חדשה!', company:'shufersal', effect:0.11, icon:'📲' },
+  { headline:'🎬 נטפליקס מאבדת מנויים לדיסני+', company:'netflix', effect:-0.13, icon:'📺' },
+  { headline:'🧱 לגו משיקה סט הארי פוטר ענק!', company:'lego', effect:0.17, icon:'🪄' },
+  { headline:'🍔 מקדונלד׳ס מוסיפה בורגר ישראלי!', company:'mcdonalds', effect:0.08, icon:'🥙' },
+  { headline:'📱 סלקום מציעה 5G לכולם בחינם!', company:'cellcom', effect:0.13, icon:'📶' },
+  { headline:'🚴 ספשיאלייזד זוכה בתחרות אופניים עולמית!', company:'specialized', effect:0.20, icon:'🥇' },
+  { headline:'🏴‍☠️ הפיראט האדום פותח סניף בתל-אביב!', company:'hapirat', effect:0.22, icon:'🎉' },
+  { headline:'👗 קסטרו מכריזה על מכירת ענק!', company:'castro', effect:0.14, icon:'🏷️' },
+  { headline:'🚌 רב-קו עולה בשכר הנסיעה', company:'ravkav', effect:-0.06, icon:'💸' },
+  { headline:'🥛 תנובה חוזרת להיות מותג מס׳ 1!', company:'tnuva', effect:0.10, icon:'🏅' },
+  { headline:'🤖 פליימוביל משיקה אבירים חדשים!', company:'playmobil', effect:0.12, icon:'⚔️' },
+  { headline:'⛏️ מיינקראפט שוברת שיא משתמשים עולמי!', company:'minecraft', effect:0.24, icon:'🌍' },
+  { headline:'🍹 קוקה קולה משיקה טעם ישראלי!', company:'cocacola', effect:0.09, icon:'🇮🇱' },
+  { headline:'🦊 פוקס פותחת חנות מקוונת!', company:'fox', effect:0.11, icon:'💻' },
+  { headline:'🏰 דיסני+ מגיעה עם סדרה חדשה!', company:'disney', effect:0.15, icon:'🎥' },
+  { headline:'🍎 אדידס מוציאה נעליים עם אפל!', company:'adidas', effect:0.10, icon:'🤝' },
+  { headline:'🎭 פלייסטיישן 6 נחשפת!', company:'playstation', effect:0.22, icon:'🎮' },
+  { headline:'😴 שוק יציב - שום דבר מיוחד', company:null, effect:0, icon:'😴' },
+];
+
+const QUESTS = [
+  { desc:'קנה לפחות מניה אחת ממגזר המזון', check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='מזון'), reward:500 },
+  { desc:'הגע לשווי תיק כולל של ₪12,000', check:(p,gs)=>totalValue(p,gs)>=12000, reward:800 },
+  { desc:'קנה מניות מ-3 מגזרים שונים', check:(p,gs)=>{const cats=new Set(p.portfolio.map(h=>COMPANIES.find(c=>c.id===h.id)?.category));return cats.size>=3;}, reward:700 },
+  { desc:'שמור ₪2,000 בחשבון חיסכון', check:(p)=>p.savings>=2000, reward:400 },
+  { desc:'קנה מניית צעצועים אחת', check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='צעצועים'), reward:450 },
+  { desc:'החזק לפחות 5 מניות שונות', check:(p)=>p.portfolio.length>=5, reward:600 },
+  { desc:'קנה מניה מסיכון "יציב"', check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.risk==='stable'), reward:350 },
+  { desc:'הגע לשווי תיק כולל של ₪15,000', check:(p,gs)=>totalValue(p,gs)>=15000, reward:1200 },
+  { desc:'קנה לפחות 3 מניות של חברת טכנולוגיה', check:(p,gs)=>{const h=p.portfolio.find(x=>COMPANIES.find(c=>c.id===x.id)?.category==='טכנולוגיה');return h&&h.qty>=3;}, reward:550 },
+  { desc:'אל תמכור אף מניה השבוע', check:(p)=>!p.soldThisRound, reward:300 },
+];
+
+// Company logos (user-uploaded, stored as base64 data URLs)
+// Key = company id, value = data URL
+let companyLogos = {};
+
+try {
+  const saved = localStorage.getItem('borsa_logos');
+  if (saved) companyLogos = JSON.parse(saved);
+} catch(e) {}
+
+function saveLogos() {
+  try { localStorage.setItem('borsa_logos', JSON.stringify(companyLogos)); } catch(e) {}
+}
+
+const AVATARS = ['😎','🦸','🧠','🦊','🐯','🦁','🐧','🦅','🐬','🦊','🎩','👑'];
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let G = {
+  players: [],
+  round: 1,
+  totalRounds: 10,
+  startCash: 10000,
+  stocks: {},       // stockId -> current price
+  priceHistory: {}, // stockId -> array of prices
+  currentPlayer: 0,
+  donePlayers: [],
+  roundNews: [],
+  roundActions: {}, // playerId -> []
+  phase: 'playing', // playing | summary | end
+};
+
+function totalValue(player, gs) {
+  let v = player.cash;
+  player.portfolio.forEach(h => { v += h.qty * (gs.stocks[h.id] || 0); });
+  v += player.savings;
+  v += player.loanAmount * -1; // actually loan is negative
+  return v;
+}
+
+// ============================================================
+// SETUP
+// ============================================================
+let playerCount = 0;
+function addPlayer() {
+  const avatarIdx = playerCount % AVATARS.length;
+  const avatar = AVATARS[avatarIdx];
+  playerCount++;
+  const id = 'p' + playerCount;
+  const div = document.createElement('div');
+  div.className = 'player-row';
+  div.id = 'player-row-' + id;
+  div.innerHTML = `
+    <span style="font-size:1.5rem">${avatar}</span>
+    <input type="text" placeholder="שם שחקן ${playerCount}" id="pname-${id}" value="שחקן ${playerCount}">
+    <button class="btn btn-icon" onclick="removePlayer('${id}')">✕</button>
+  `;
+  document.getElementById('players-list').appendChild(div);
+}
+
+function removePlayer(id) {
+  const el = document.getElementById('player-row-' + id);
+  if (el) el.remove();
+}
+
+function startGame() {
+  const rows = document.querySelectorAll('.player-row');
+  if (rows.length < 1) { showToast('הוסף לפחות שחקן אחד!', 'red'); return; }
+  
+  const cash = parseInt(document.getElementById('start-cash').value) || 10000;
+  const rounds = parseInt(document.getElementById('num-rounds').value) || 10;
+  
+  const players = [];
+  rows.forEach((row, i) => {
+    const inp = row.querySelector('input[type="text"]');
+    const name = inp ? inp.value.trim() || ('שחקן ' + (i+1)) : 'שחקן ' + (i+1);
+    const avatarSpan = row.querySelector('span');
+    const avatar = avatarSpan ? avatarSpan.textContent : AVATARS[i % AVATARS.length];
+    players.push({
+      id: 'p' + (i+1),
+      name,
+      avatar,
+      cash,
+      portfolio: [],         // {id, qty, avgCost}
+      savings: 0,
+      savingsRoundsLeft: 0,
+      loanAmount: 0,
+      loanInterestDue: 0,
+      hasInsurance: false,
+      hasNewsSub: false,
+      newsSubRoundsLeft: 0,
+      soldThisRound: false,
+      quest: null,
+      questDone: false,
+      totalValueHistory: [cash],
+    });
+  });
+  
+  G.players = players;
+  G.round = 1;
+  G.totalRounds = rounds;
+  G.startCash = cash;
+  G.currentPlayer = 0;
+  G.donePlayers = [];
+  G.roundActions = {};
+  players.forEach(p => { G.roundActions[p.id] = []; });
+  
+  // Init stock prices
+  COMPANIES.forEach(c => {
+    G.stocks[c.id] = c.basePrice;
+    G.priceHistory[c.id] = [c.basePrice];
+  });
+  
+  // Assign quests
+  assignQuests();
+  
+  G.phase = 'playing';
+  saveGame();
+  showGameScreen();
+}
+
+function assignQuests() {
+  const shuffled = [...QUESTS].sort(() => Math.random() - 0.5);
+  G.players.forEach((p, i) => {
+    p.quest = shuffled[i % shuffled.length];
+    p.questDone = false;
+  });
+}
+
+// ============================================================
+// LOAD / SAVE
+// ============================================================
+function saveGame() {
+  try { localStorage.setItem('borsa_save', JSON.stringify(G)); } catch(e) {}
+}
+
+function loadGame() {
+  const raw = localStorage.getItem('borsa_save');
+  if (!raw) return;
+  G = JSON.parse(raw);
+  // Restore quest functions (they don't serialize)
+  G.players.forEach(p => {
+    if (p.quest) {
+      const match = QUESTS.find(q => q.desc === p.quest.desc);
+      if (match) p.quest = match;
+    }
+  });
+  if (G.phase === 'playing') showGameScreen();
+  else if (G.phase === 'summary') showSummaryScreen();
+  else showEndScreen();
+}
+
+function resetSave() {
+  if (!confirm('בטוח שרוצה למחוק את השמירה?')) return;
+  localStorage.removeItem('borsa_save');
+  location.reload();
+}
+
+// ============================================================
+// SCREENS
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.classList.add('active');
+  el.style.display = '';
+}
+
+function showGameScreen() {
+  showScreen('game-screen');
+  renderPlayerTabs();
+  renderSidebar();
+  renderStocks();
+  updateNewsTicker();
+}
+
+function showSummaryScreen() {
+  G.phase = 'summary';
+  showScreen('summary-screen');
+  renderSummary();
+}
+
+function showEndScreen() {
+  G.phase = 'end';
+  showScreen('end-screen');
+  renderEnd();
+}
+
+function goToSetup() {
+  localStorage.removeItem('borsa_save');
+  location.reload();
+}
+
+// ============================================================
+// GAME SCREEN RENDERING
+// ============================================================
+function renderPlayerTabs() {
+  const container = document.getElementById('player-tabs');
+  container.innerHTML = '';
+  G.players.forEach((p, i) => {
+    const done = G.donePlayers.includes(p.id);
+    const tv = totalValue(p, G);
+    const div = document.createElement('div');
+    div.className = 'player-tab' + (i === G.currentPlayer ? ' active' : '');
+    div.onclick = () => { if (!done) { G.currentPlayer = i; renderSidebar(); renderStocks(); renderPlayerTabs(); } };
+    div.innerHTML = `${p.avatar} ${p.name} <span class="tab-value mono">₪${fmt(tv)}</span> ${done ? '<span class="tab-done">✓</span>' : ''}`;
+    container.appendChild(div);
+  });
+}
+
+function updateHeaderCash() {
+  const p = G.players[G.currentPlayer];
+  if (!p) return;
+  const av = document.getElementById('header-player-avatar');
+  const nm = document.getElementById('header-player-name');
+  const cv = document.getElementById('header-cash-value');
+  if (av) av.textContent = p.avatar;
+  if (nm) nm.textContent = p.name;
+  if (cv) cv.textContent = '₪' + fmt(p.cash);
+}
+
+function renderSidebar() {
+  updateHeaderCash();
+  const p = G.players[G.currentPlayer];
+  if (!p) return;
+  
+  // Profile
+  const tv = totalValue(p, G);
+  const startV = G.startCash;
+  const pct = (((tv - startV) / startV) * 100).toFixed(1);
+  const pctClass = pct >= 0 ? 'green' : 'red';
+  
+  document.getElementById('player-profile').innerHTML = `
+    <div class="player-avatar">${p.avatar}</div>
+    <div class="player-name-big">${p.name}</div>
+    <div class="player-cash">₪${fmt(p.cash)}</div>
+    <div class="player-cash-label">מזומן זמין</div>
+    <div class="stat-row mt-16">
+      <span class="stat-label">שווי תיק כולל</span>
+      <span class="stat-val yellow">₪${fmt(tv)}</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">רווח/הפסד כולל</span>
+      <span class="stat-val ${pctClass}">${pct >= 0 ? '+' : ''}${pct}%</span>
+    </div>
+    ${p.loanAmount > 0 ? `
+    <div class="stat-row">
+      <span class="stat-label">הלוואה פעילה</span>
+      <span class="stat-val red">-₪${fmt(p.loanAmount)}</span>
+    </div>` : ''}
+    ${p.hasInsurance ? `
+    <div class="stat-row">
+      <span class="stat-label">ביטוח שוק</span>
+      <span class="stat-val green">✓ מבוטח</span>
+    </div>` : ''}
+    ${p.hasNewsSub ? `
+    <div class="stat-row">
+      <span class="stat-label">מינוי חדשות</span>
+      <span class="stat-val green">✓ (${p.newsSubRoundsLeft} ימים)</span>
+    </div>` : ''}
+  `;
+  
+  // Portfolio
+  let portHTML = `<div style="margin-top:16px"><div class="section-title">💼 תיק מניות</div>`;
+  if (p.portfolio.length === 0) {
+    portHTML += `<div class="text-muted" style="margin-top:8px;">אין מניות עדיין</div>`;
+  } else {
+    portHTML += `<div class="portfolio-list">`;
+    p.portfolio.forEach(h => {
+      const company = COMPANIES.find(c => c.id === h.id);
+      const curPrice = G.stocks[h.id];
+      const val = h.qty * curPrice;
+      const cost = h.qty * h.avgCost;
+      const pnl = val - cost;
+      const pnlClass = pnl >= 0 ? 'green' : 'red';
+      portHTML += `
+        <div class="port-item">
+          <div class="port-item-top">
+            <span>${company.emoji} ${company.name} ×${h.qty}</span>
+            <span class="mono">₪${fmt(val)}</span>
+          </div>
+          <div class="port-item-bot">
+            <span>₪${fmt(curPrice)} למניה</span>
+            <span class="mono ${pnlClass}">${pnl >= 0 ? '+' : ''}₪${fmt(pnl)}</span>
+          </div>
+        </div>`;
+    });
+    portHTML += `</div>`;
+  }
+  portHTML += `</div>`;
+  
+  // Savings
+  if (p.savings > 0) {
+    portHTML += `
+    <div class="savings-card">
+      <div class="savings-label">🏦 חיסכון בנקאי</div>
+      <div class="savings-amount">₪${fmt(p.savings)}</div>
+      <div class="savings-info">${p.savingsRoundsLeft > 0 ? `נפתח בעוד ${p.savingsRoundsLeft} ימים` : 'זמין למשיכה'}</div>
+    </div>`;
+  }
+  
+  document.getElementById('portfolio-section').innerHTML = portHTML;
+  
+  // Diversification
+  renderDiversification(p);
+  
+  // Quest
+  renderQuest(p);
+  
+  // Actions
+  const actionsDiv = document.getElementById('sidebar-actions');
+  actionsDiv.innerHTML = `
+    <div class="section-title" style="margin-bottom:8px;">⚡ פעולות מיוחדות</div>
+    <button class="btn btn-secondary btn-sm" onclick="openBankModal()" style="justify-content:flex-start">🏦 חשבון חיסכון</button>
+    <button class="btn btn-secondary btn-sm" onclick="openLoanModal()" style="justify-content:flex-start">💳 הלוואה</button>
+    <button class="btn btn-secondary btn-sm" onclick="openInsuranceModal()" style="justify-content:flex-start">🛡️ ביטוח שוק</button>
+    <button class="btn btn-secondary btn-sm" onclick="openNewsSubModal()" style="justify-content:flex-start">📰 מינוי חדשות מוקדמות</button>
+    <button class="btn btn-primary btn-sm" onclick="endTurn()" style="margin-top:8px">✅ סיים תור →</button>
+  `;
+}
+
+function renderDiversification(p) {
+  const cats = new Set(p.portfolio.map(h => COMPANIES.find(c => c.id === h.id)?.category).filter(Boolean));
+  const score = Math.min(cats.size, 5);
+  const pct = (score / 5) * 100;
+  const color = score <= 1 ? 'var(--red)' : score <= 2 ? 'var(--orange)' : score <= 3 ? 'var(--yellow)' : 'var(--green)';
+  const labels = ['0','💀 כל הביצים בסל אחד!','⚠️ גיוון נמוך','🌤️ מתחיל','👍 טוב!','🌟 מגוון מצוין!'];
+  
+  document.getElementById('sidebar-features').innerHTML = `
+    <div class="div-meter-wrap">
+      <div class="section-title">📊 ציון גיוון תיק</div>
+      <div class="div-meter-bar">
+        <div class="div-meter-fill" style="width:${pct}%;background:${color}"></div>
+      </div>
+      <div style="font-size:0.8rem;color:var(--text2);display:flex;justify-content:space-between">
+        <span>${labels[score]}</span>
+        <span class="mono">${score}/5 מגזרים</span>
+      </div>
+    </div>
+  `;
+}
+
+function renderQuest(p) {
+  if (!p.quest) return;
+  const done = p.questDone;
+  document.getElementById('quest-section').innerHTML = `
+    <div class="quest-card">
+      <div class="quest-title">🎯 משימה יומית</div>
+      <div class="quest-desc">${p.quest.desc} ${done ? '✅' : ''}</div>
+      <div class="quest-reward">🎁 פרס: ₪${fmt(p.quest.reward)} ${done ? '(הושלמה!)' : ''}</div>
+    </div>
+  `;
+}
+
+// ============================================================
+// STOCK GRID
+// ============================================================
+let activeFilter = 'הכל';
+function renderStocks() {
+  const p = G.players[G.currentPlayer];
+  
+  // Filter pills
+  const pillsEl = document.getElementById('filter-pills');
+  if (!pillsEl.children.length) {
+    CATEGORIES.forEach(cat => {
+      const span = document.createElement('span');
+      span.className = 'pill' + (cat === activeFilter ? ' active' : '');
+      span.textContent = cat;
+      span.onclick = () => { activeFilter = cat; renderStocks(); };
+      pillsEl.appendChild(span);
+    });
+  } else {
+    pillsEl.querySelectorAll('.pill').forEach(pill => {
+      pill.className = 'pill' + (pill.textContent === activeFilter ? ' active' : '');
+    });
+  }
+  
+  const search = (document.getElementById('search-input').value || '').toLowerCase();
+  const grid = document.getElementById('stocks-grid');
+  grid.innerHTML = '';
+  
+  let visible = COMPANIES;
+  if (activeFilter !== 'הכל') visible = visible.filter(c => c.category === activeFilter);
+  if (search) visible = visible.filter(c => c.name.toLowerCase().includes(search) || c.category.includes(search));
+  
+  visible.forEach(company => {
+    const price = G.stocks[company.id];
+    const hist = G.priceHistory[company.id] || [price];
+    const prevPrice = hist.length >= 2 ? hist[hist.length - 2] : price;
+    const change = price - prevPrice;
+    const changePct = prevPrice > 0 ? ((change / prevPrice) * 100).toFixed(1) : '0.0';
+    const holding = p.portfolio.find(h => h.id === company.id);
+    
+    const card = document.createElement('div');
+    card.className = 'stock-card' + (holding ? ' owned' : '');
+    card.id = 'card-' + company.id;
+    
+    const riskLabel = {stable:'יציב',volatile:'תנודתי','very-volatile':'תנודתי מאוד'}[company.risk];
+    const riskClass = 'risk-' + company.risk;
+    const changeClass = change > 0 ? 'change-up' : change < 0 ? 'change-down' : 'change-neutral';
+    const changeSign = change > 0 ? '+' : '';
+    
+    card.innerHTML = `
+      <div class="stock-header">
+        <div>
+          <div class="stock-emoji">${companyLogos[company.id] ? `<img src="${companyLogos[company.id]}" class="stock-logo-img" alt="${company.name}">` : company.emoji}</div>
+          <div class="stock-name">${company.name}</div>
+          <div class="stock-category"><span class="tag tag-cat">${company.category}</span></div>
+        </div>
+        <div>
+          <span class="stock-risk ${riskClass}">${riskLabel}</span>
+        </div>
+      </div>
+      <div class="stock-price-row">
+        <div class="stock-price">₪${fmt(price)}</div>
+        <div class="stock-change ${changeClass}">${changeSign}${changePct}%</div>
+      </div>
+      <div class="mini-chart"><canvas id="chart-${company.id}" height="40"></canvas></div>
+      ${holding ? `<div class="stock-owned-badge">✓ ברשותך: ${holding.qty} מניות</div>` : ''}
+      <div class="stock-actions">
+        <button class="buy-btn" onclick="openBuyModal('${company.id}')">קנה ▲</button>
+        <button class="sell-btn" ${!holding ? 'disabled' : ''} onclick="openSellModal('${company.id}')">מכור ▼</button>
+      </div>
+    `;
+    
+    grid.appendChild(card);
+    drawMiniChart(company.id);
+  });
+}
+
+function drawMiniChart(id) {
+  const canvas = document.getElementById('chart-' + id);
+  if (!canvas) return;
+  const hist = G.priceHistory[id] || [];
+  if (hist.length < 2) { return; }
+  
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth || 240;
+  canvas.height = 40;
+  
+  const min = Math.min(...hist);
+  const max = Math.max(...hist);
+  const range = max - min || 1;
+  const w = canvas.width, h = canvas.height;
+  const last = hist[hist.length - 1];
+  const first = hist[0];
+  const color = last >= first ? '#00ff88' : '#ff3366';
+  
+  ctx.clearRect(0, 0, w, h);
+  ctx.beginPath();
+  hist.forEach((p, i) => {
+    const x = (i / (hist.length - 1)) * w;
+    const y = h - ((p - min) / range) * (h - 4) - 2;
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  });
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  
+  // Fill
+  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+  ctx.fillStyle = color + '22';
+  ctx.fill();
+}
+
+function filterStocks() { renderStocks(); }
+
+// ============================================================
+// BUY / SELL MODALS
+// ============================================================
+function openBuyModal(companyId) {
+  const company = COMPANIES.find(c => c.id === companyId);
+  const p = G.players[G.currentPlayer];
+  const price = G.stocks[companyId];
+  let qty = 1;
+  
+  function render() {
+    const total = qty * price;
+    const canAfford = p.cash >= total;
+    document.getElementById('modal-content').innerHTML = `
+      <h2>${companyLogos[company.id] ? `<img src="${companyLogos[company.id]}" style="width:32px;height:32px;object-fit:contain;border-radius:6px;vertical-align:middle">` : company.emoji} קנה מניות - ${company.name}</h2>
+      <div class="modal-info">
+        <div class="row"><span>מחיר למניה</span><span class="mono">₪${fmt(price)}</span></div>
+        <div class="row"><span>מזומן זמין</span><span class="mono">₪${fmt(p.cash)}</span></div>
+        <div class="row"><span>סיכון</span><span class="stock-risk risk-${company.risk}" style="font-size:0.75rem">{{risk}}</span></div>
+        <div class="row"><span>מגזר</span><span>${company.category}</span></div>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:12px;">כמה מניות לקנות?</div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeBuyQty('${companyId}', -1)">−</button>
+        <div class="qty-display">${qty}</div>
+        <button class="qty-btn" onclick="changeBuyQty('${companyId}', 1)">+</button>
+      </div>
+      <div class="total-cost" style="color:${canAfford ? 'var(--green)' : 'var(--red)'}">
+        ${canAfford ? '✓' : '✗'} סה"כ: ₪${fmt(total)}
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-success full-w" onclick="executeBuy('${companyId}')" ${!canAfford ? 'disabled' : ''}>🛒 קנה ${qty} מניות</button>
+        <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+      </div>
+    `.replace('{{risk}}', {stable:'יציב',volatile:'תנודתי','very-volatile':'תנודתי מאוד'}[company.risk]);
+  }
+  
+  window._buyQty = qty;
+  window._buyCompanyId = companyId;
+  window.changeBuyQty = (id, delta) => {
+    window._buyQty = Math.max(1, window._buyQty + delta);
+    const total = window._buyQty * G.stocks[id];
+    const p2 = G.players[G.currentPlayer];
+    if (window._buyQty > 1 && total > p2.cash) window._buyQty--;
+    qty = window._buyQty;
+    render();
+  };
+  window.executeBuy = (id) => {
+    const qty2 = window._buyQty;
+    buyStock(id, qty2);
+    closeModal();
+  };
+  
+  render();
+  openModal();
+}
+
+function openSellModal(companyId) {
+  const company = COMPANIES.find(c => c.id === companyId);
+  const p = G.players[G.currentPlayer];
+  const price = G.stocks[companyId];
+  const holding = p.portfolio.find(h => h.id === companyId);
+  if (!holding) return;
+  let qty = 1;
+  
+  function render() {
+    const total = qty * price;
+    const cost = qty * holding.avgCost;
+    const profit = total - cost;
+    const tax = profit > 0 ? Math.round(profit * 0.1) : 0;
+    const net = total - tax;
+    
+    document.getElementById('modal-content').innerHTML = `
+      <h2>${companyLogos[company.id] ? `<img src="${companyLogos[company.id]}" style="width:32px;height:32px;object-fit:contain;border-radius:6px;vertical-align:middle">` : company.emoji} מכור מניות - ${company.name}</h2>
+      <div class="modal-info">
+        <div class="row"><span>מחיר נוכחי</span><span class="mono">₪${fmt(price)}</span></div>
+        <div class="row"><span>ממוצע קנייה שלך</span><span class="mono">₪${fmt(Math.round(holding.avgCost))}</span></div>
+        <div class="row"><span>ברשותך</span><span class="mono">${holding.qty} מניות</span></div>
+      </div>
+      <div style="font-size:0.85rem;color:var(--text2);margin-bottom:12px;">כמה מניות למכור?</div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeSellQty('${companyId}', -1)">−</button>
+        <div class="qty-display">${qty}</div>
+        <button class="qty-btn" onclick="changeSellQty('${companyId}', 1)">+</button>
+      </div>
+      <div class="modal-info">
+        <div class="row"><span>הכנסה ברוטו</span><span class="mono">₪${fmt(total)}</span></div>
+        <div class="row"><span>רווח/הפסד</span><span class="mono" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}₪${fmt(profit)}</span></div>
+        ${tax > 0 ? `<div class="row"><span>מס רווח הון (10%)</span><span class="mono" style="color:var(--red)">-₪${fmt(tax)}</span></div>` : ''}
+        <div class="row"><span><b>נטו לכיס</b></span><span class="mono" style="color:var(--green)"><b>₪${fmt(net)}</b></span></div>
+      </div>
+      ${tax > 0 ? `<div class="tax-notice">💡 מסים עוזרים לבנות בתי-ספר, גנים ציבוריים ובתי-חולים לכולנו!</div>` : ''}
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-danger full-w" onclick="executeSell('${companyId}')">💸 מכור ${qty} מניות</button>
+        <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+      </div>
+    `;
+  }
+  
+  window._sellQty = qty;
+  window.changeSellQty = (id, delta) => {
+    const h = G.players[G.currentPlayer].portfolio.find(x => x.id === id);
+    window._sellQty = Math.max(1, Math.min(h.qty, window._sellQty + delta));
+    qty = window._sellQty;
+    render();
+  };
+  window.executeSell = (id) => {
+    sellStock(id, window._sellQty);
+    closeModal();
+  };
+  
+  render();
+  openModal();
+}
+
+// ============================================================
+// TRANSACTIONS
+// ============================================================
+function buyStock(companyId, qty) {
+  const p = G.players[G.currentPlayer];
+  const price = G.stocks[companyId];
+  const total = qty * price;
+  
+  if (p.cash < total) { showToast('אין מספיק מזומן!', 'red'); return; }
+  
+  p.cash -= total;
+  
+  const existing = p.portfolio.find(h => h.id === companyId);
+  if (existing) {
+    const newAvg = ((existing.avgCost * existing.qty) + (price * qty)) / (existing.qty + qty);
+    existing.avgCost = newAvg;
+    existing.qty += qty;
+  } else {
+    p.portfolio.push({ id: companyId, qty, avgCost: price });
+  }
+  
+  const company = COMPANIES.find(c => c.id === companyId);
+  G.roundActions[p.id].push({ type:'buy', company:company.name, qty, price, total });
+  
+  // Check quest
+  checkQuest(p);
+  
+  const card = document.getElementById('card-' + companyId);
+  if (card) card.classList.add('flash-green');
+  setTimeout(() => { if (card) card.classList.remove('flash-green'); }, 600);
+  
+  showToast(`✅ קנית ${qty} מניות של ${company.name}!`, 'green');
+  saveGame();
+  renderSidebar();
+  renderStocks();
+}
+
+function sellStock(companyId, qty) {
+  const p = G.players[G.currentPlayer];
+  const price = G.stocks[companyId];
+  const holding = p.portfolio.find(h => h.id === companyId);
+  if (!holding || holding.qty < qty) { showToast('אין מספיק מניות!', 'red'); return; }
+  
+  const total = qty * price;
+  const cost = qty * holding.avgCost;
+  const profit = total - cost;
+  const tax = profit > 0 ? Math.round(profit * 0.1) : 0;
+  const net = total - tax;
+  
+  p.cash += net;
+  holding.qty -= qty;
+  if (holding.qty === 0) p.portfolio = p.portfolio.filter(h => h.id !== companyId);
+  
+  p.soldThisRound = true;
+  
+  const company = COMPANIES.find(c => c.id === companyId);
+  G.roundActions[p.id].push({ type:'sell', company:company.name, qty, price, total, profit, tax });
+  
+  const card = document.getElementById('card-' + companyId);
+  if (card) card.classList.add('flash-red');
+  setTimeout(() => { if (card) card.classList.remove('flash-red'); }, 600);
+  
+  const msg = profit > 0 ? `✅ מכרת ברווח של ₪${fmt(profit)}! (מס: ₪${fmt(tax)})` : `📉 מכרת בהפסד של ₪${fmt(Math.abs(profit))}`;
+  showToast(msg, profit >= 0 ? 'green' : 'red');
+  saveGame();
+  renderSidebar();
+  renderStocks();
+}
+
+function checkQuest(p) {
+  if (!p.quest || p.questDone) return;
+  if (p.quest.check(p, G)) {
+    p.questDone = true;
+    p.cash += p.quest.reward;
+    showToast(`🎯 משימה הושלמה! קיבלת ₪${fmt(p.quest.reward)}!`, 'yellow');
+    G.roundActions[p.id].push({ type:'quest', desc:p.quest.desc, reward:p.quest.reward });
+  }
+}
+
+// ============================================================
+// SPECIAL FEATURES
+// ============================================================
+function openBankModal() {
+  const p = G.players[G.currentPlayer];
+  document.getElementById('modal-content').innerHTML = `
+    <h2>🏦 חשבון חיסכון בנקאי</h2>
+    <div class="modal-info">
+      <div class="row"><span>מזומן זמין</span><span class="mono">₪${fmt(p.cash)}</span></div>
+      <div class="row"><span>חיסכון קיים</span><span class="mono ${p.savings>0?'green':''}">₪${fmt(p.savings)}</span></div>
+      ${p.savings > 0 ? `<div class="row"><span>ימים לפתיחה</span><span class="mono yellow">${p.savingsRoundsLeft}</span></div>` : ''}
+    </div>
+    <div class="tax-notice" style="border-color:rgba(0,229,255,0.3);color:var(--accent);background:rgba(0,229,255,0.1)">
+      💡 חיסכון בבנק מקבל ריבית של 3% לכל 5 סיבובים ואינו מושפע מהשוק. הכסף ננעל ל-5 סיבובים!
+    </div>
+    ${p.savings > 0 && p.savingsRoundsLeft === 0 ? `
+    <button class="btn btn-primary full-w mb-16" onclick="withdrawSavings()">📤 משוך את החיסכון (₪${fmt(Math.round(p.savings * 1.03))})</button>
+    ` : ''}
+    ${p.savings === 0 || p.savingsRoundsLeft === 0 ? `
+    <div class="input-group">
+      <label>כמה להפקיד? (₪)</label>
+      <input type="number" id="deposit-amt" value="${Math.min(1000, p.cash)}" min="100" max="${p.cash}" step="100">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-success full-w" onclick="depositSavings()">🏦 הפקד לחיסכון</button>
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+    </div>
+    ` : `<button class="btn btn-secondary full-w" onclick="closeModal()">סגור</button>`}
+  `;
+  openModal();
+}
+
+function depositSavings() {
+  const p = G.players[G.currentPlayer];
+  const amt = parseInt(document.getElementById('deposit-amt').value) || 0;
+  if (amt <= 0 || amt > p.cash) { showToast('סכום לא תקין!', 'red'); return; }
+  p.cash -= amt;
+  p.savings += amt;
+  p.savingsRoundsLeft = 5;
+  G.roundActions[p.id].push({ type:'deposit', amount:amt });
+  showToast(`🏦 הפקדת ₪${fmt(amt)} לחיסכון!`, 'green');
+  saveGame(); renderSidebar(); closeModal();
+}
+
+function withdrawSavings() {
+  const p = G.players[G.currentPlayer];
+  if (p.savingsRoundsLeft > 0) { showToast('החיסכון עדיין נעול!', 'red'); return; }
+  const withInterest = Math.round(p.savings * 1.03);
+  G.roundActions[p.id].push({ type:'withdraw', amount:withInterest });
+  p.cash += withInterest;
+  p.savings = 0;
+  p.savingsRoundsLeft = 0;
+  showToast(`💰 משכת ₪${fmt(withInterest)} מהחיסכון (+3% ריבית)!`, 'green');
+  saveGame(); renderSidebar(); closeModal();
+}
+
+function openLoanModal() {
+  const p = G.players[G.currentPlayer];
+  const tv = totalValue(p, G);
+  const maxLoan = Math.round(tv * 0.2);
+  const canBorrow = maxLoan - p.loanAmount;
+  
+  document.getElementById('modal-content').innerHTML = `
+    <h2>💳 הלוואה בנקאית</h2>
+    <div class="modal-info">
+      <div class="row"><span>שווי תיק</span><span class="mono">₪${fmt(tv)}</span></div>
+      <div class="row"><span>מקסימום הלוואה (20%)</span><span class="mono">₪${fmt(maxLoan)}</span></div>
+      <div class="row"><span>הלוואה קיימת</span><span class="mono red">₪${fmt(p.loanAmount)}</span></div>
+      <div class="row"><span>ניתן ללוות עוד</span><span class="mono yellow">₪${fmt(Math.max(0,canBorrow))}</span></div>
+    </div>
+    <div class="tax-notice" style="border-color:rgba(255,140,0,0.3);color:var(--orange);background:rgba(255,140,0,0.1)">
+      ⚠️ ריבית: 8% על ההלוואה כל 5 ימים. אם השוק ינפול - עלול להיות קשה לפרוע!
+    </div>
+    ${canBorrow > 0 ? `
+    <div class="input-group">
+      <label>כמה ללוות? (₪)</label>
+      <input type="number" id="loan-amt" value="${Math.min(500, canBorrow)}" min="100" max="${canBorrow}" step="100">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-danger full-w" onclick="takeLoan()">💸 לקח הלוואה</button>
+      ${p.loanAmount > 0 ? `<button class="btn btn-success" onclick="repayLoan()">✅ פרע הלוואה</button>` : ''}
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+    </div>
+    ` : `
+    ${p.loanAmount > 0 ? `<button class="btn btn-success full-w mb-16" onclick="repayLoan()">✅ פרע הלוואה (₪${fmt(p.loanAmount)})</button>` : ''}
+    <button class="btn btn-secondary full-w" onclick="closeModal()">סגור</button>
+    `}
+  `;
+  openModal();
+}
+
+function takeLoan() {
+  const p = G.players[G.currentPlayer];
+  const amt = parseInt(document.getElementById('loan-amt').value) || 0;
+  const tv = totalValue(p, G);
+  const maxLoan = Math.round(tv * 0.2);
+  const canBorrow = maxLoan - p.loanAmount;
+  if (amt <= 0 || amt > canBorrow) { showToast('סכום לא תקין!', 'red'); return; }
+  p.cash += amt;
+  p.loanAmount += amt;
+  G.roundActions[p.id].push({ type:'loan', amount:amt });
+  showToast(`💳 קיבלת הלוואה של ₪${fmt(amt)}!`, 'yellow');
+  saveGame(); renderSidebar(); closeModal();
+}
+
+function repayLoan() {
+  const p = G.players[G.currentPlayer];
+  if (p.cash < p.loanAmount) { showToast('אין מספיק מזומן לפירעון!', 'red'); return; }
+  p.cash -= p.loanAmount;
+  G.roundActions[p.id].push({ type:'repay', amount:p.loanAmount });
+  showToast(`✅ פרעת את ההלוואה!`, 'green');
+  p.loanAmount = 0;
+  saveGame(); renderSidebar(); closeModal();
+}
+
+function openInsuranceModal() {
+  const p = G.players[G.currentPlayer];
+  const cost = 200;
+  document.getElementById('modal-content').innerHTML = `
+    <h2>🛡️ ביטוח שוק</h2>
+    <div class="modal-info">
+      <div class="row"><span>מצב ביטוח</span><span class="${p.hasInsurance?'badge badge-green':'badge badge-red'}">${p.hasInsurance?'✓ מבוטח':'✗ לא מבוטח'}</span></div>
+      <div class="row"><span>עלות ביטוח</span><span class="mono">₪${fmt(cost)} ליום</span></div>
+    </div>
+    <div class="tax-notice" style="border-color:rgba(0,229,255,0.3);color:var(--accent);background:rgba(0,229,255,0.1)">
+      💡 ביטוח מגן על 50% מהפסדי התיק באירועי קריסת שוק. כמו ביטוח לרכב!
+    </div>
+    ${!p.hasInsurance ? `
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary full-w" onclick="buyInsurance()">🛡️ קנה ביטוח (₪${cost})</button>
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+    </div>
+    ` : `
+    <button class="btn btn-secondary full-w" onclick="closeModal()">סגור</button>
+    `}
+  `;
+  openModal();
+}
+
+function buyInsurance() {
+  const p = G.players[G.currentPlayer];
+  const cost = 200;
+  if (p.cash < cost) { showToast('אין מספיק מזומן!', 'red'); return; }
+  p.cash -= cost;
+  p.hasInsurance = true;
+  G.roundActions[p.id].push({ type:'insurance', amount:cost });
+  showToast('🛡️ קנית ביטוח שוק!', 'green');
+  saveGame(); renderSidebar(); closeModal();
+}
+
+function openNewsSubModal() {
+  const p = G.players[G.currentPlayer];
+  const cost = 500;
+  const nextNews = generateNewsForRound(G.round + 1).slice(0, 2);
+  
+  document.getElementById('modal-content').innerHTML = `
+    <h2>📰 מינוי חדשות מוקדמות</h2>
+    <div class="modal-info">
+      <div class="row"><span>עלות מינוי</span><span class="mono">₪${fmt(cost)}</span></div>
+      <div class="row"><span>מצב מינוי</span><span class="${p.hasNewsSub?'badge badge-green':'badge badge-red'}">${p.hasNewsSub?`✓ פעיל (${p.newsSubRoundsLeft} ימים)`:'✗ לא פעיל'}</span></div>
+    </div>
+    ${p.hasNewsSub ? `
+    <div class="section-title" style="margin-top:16px">🔮 תצוגה מקדימה של מחר</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${nextNews.map(n => `
+        <div style="background:var(--bg2);border-radius:8px;padding:12px;border:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:4px">${n.icon} ${n.headline}</div>
+          <div style="font-size:0.8rem;color:${n.effect>=0?'var(--green)':'var(--red)'}">${n.effect>=0?'+':''}${(n.effect*100).toFixed(0)}% השפעה</div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="btn btn-secondary full-w mt-16" onclick="closeModal()">סגור</button>
+    ` : `
+    <div class="tax-notice" style="border-color:rgba(124,58,237,0.3);color:#a78bfa;background:rgba(124,58,237,0.1)">
+      🔮 מינוי נותן לך גישה מוקדמת לחדשות המחר - יתרון אסטרטגי עצום!
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-secondary btn-sm full-w" onclick="buyNewsSub()">📰 קנה מינוי (₪${cost})</button>
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+    </div>
+    `}
+  `;
+  openModal();
+}
+
+function buyNewsSub() {
+  const p = G.players[G.currentPlayer];
+  const cost = 500;
+  if (p.cash < cost) { showToast('אין מספיק מזומן!', 'red'); return; }
+  p.cash -= cost;
+  p.hasNewsSub = true;
+  p.newsSubRoundsLeft = 3;
+  G.roundActions[p.id].push({ type:'newssub', amount:cost });
+  showToast('📰 קנית מינוי חדשות מוקדמות!', 'yellow');
+  saveGame(); renderSidebar(); closeModal();
+}
+
+// ============================================================
+// END TURN
+// ============================================================
+function endTurn() {
+  const p = G.players[G.currentPlayer];
+  if (G.donePlayers.includes(p.id)) { showToast('כבר סיימת את תורך!', 'yellow'); return; }
+  
+  // Apply inflation (0.5% on uninvested cash)
+  const inflation = Math.round(p.cash * 0.005);
+  if (inflation > 0) {
+    p.cash -= inflation;
+    if (inflation > 5) showToast(`📉 אינפלציה: איבדת ₪${fmt(inflation)} על מזומן לא מושקע`, 'yellow');
+  }
+  
+  G.donePlayers.push(p.id);
+  
+  // Find next not-done player
+  let nextIdx = -1;
+  for (let i = 0; i < G.players.length; i++) {
+    if (!G.donePlayers.includes(G.players[i].id)) { nextIdx = i; break; }
+  }
+  
+  if (nextIdx === -1) {
+    // All done - go to summary
+    processRoundEnd();
+    showSummaryScreen();
+  } else {
+    G.currentPlayer = nextIdx;
+    showToast(`תור של ${G.players[nextIdx].name}!`, 'yellow');
+    renderPlayerTabs();
+    renderSidebar();
+    renderStocks();
+  }
+  
+  saveGame();
+}
+
+// ============================================================
+// ROUND END PROCESSING
+// ============================================================
+function generateNewsForRound(round) {
+  const seed = round * 7919;
+  const shuffled = [...NEWS_EVENTS].sort((a,b) => {
+    const ra = Math.sin(seed + NEWS_EVENTS.indexOf(a)) * 10000;
+    const rb = Math.sin(seed + NEWS_EVENTS.indexOf(b)) * 10000;
+    return (ra - Math.floor(ra)) - (rb - Math.floor(rb));
+  });
+  return shuffled.slice(0, 3 + (round % 2));
+}
+
+function processRoundEnd() {
+  const news = generateNewsForRound(G.round);
+  G.roundNews = news;
+  
+  // Update stock prices
+  COMPANIES.forEach(company => {
+    let changeMultiplier = 1;
+    
+    // News effects
+    news.forEach(n => {
+      if (n.company === company.id) changeMultiplier += n.effect;
+    });
+    
+    // Random fluctuation based on risk
+    const volatility = { stable:0.05, volatile:0.12, 'very-volatile':0.20 }[company.risk];
+    const rand = (Math.random() - 0.5) * 2 * volatility;
+    changeMultiplier += rand;
+    
+    // Clamp
+    changeMultiplier = Math.max(0.7, Math.min(1.5, changeMultiplier));
+    
+    const newPrice = Math.max(5, Math.round(G.stocks[company.id] * changeMultiplier));
+    G.stocks[company.id] = newPrice;
+    G.priceHistory[company.id].push(newPrice);
+  });
+  
+  // Pay dividends to stable stock holders
+  G.players.forEach(p => {
+    if (G.round % 3 === 0) {
+      p.portfolio.forEach(h => {
+        const company = COMPANIES.find(c => c.id === h.id);
+        if (company && company.risk === 'stable') {
+          const dividend = Math.round(h.qty * G.stocks[h.id] * 0.02);
+          if (dividend > 0) {
+            p.cash += dividend;
+            G.roundActions[p.id].push({ type:'dividend', company:company.name, amount:dividend });
+          }
+        }
+      });
+    }
+    
+    // Loan interest
+    if (p.loanAmount > 0 && G.round % 5 === 0) {
+      const interest = Math.round(p.loanAmount * 0.08);
+      p.cash -= interest;
+      G.roundActions[p.id].push({ type:'loaninterest', amount:interest });
+    }
+    
+    // Savings unlock
+    if (p.savingsRoundsLeft > 0) p.savingsRoundsLeft--;
+    
+    // News sub
+    if (p.hasNewsSub && p.newsSubRoundsLeft > 0) p.newsSubRoundsLeft--;
+    if (p.newsSubRoundsLeft === 0) p.hasNewsSub = false;
+    
+    // Track total value history
+    p.totalValueHistory.push(totalValue(p, G));
+    
+    // Reset per-round flags
+    p.soldThisRound = false;
+    
+    // Assign new quest
+    const newQuest = QUESTS[Math.floor(Math.random() * QUESTS.length)];
+    p.quest = newQuest;
+    p.questDone = false;
+  });
+  
+  saveGame();
+}
+
+// ============================================================
+// SUMMARY SCREEN
+// ============================================================
+function renderSummary() {
+  document.getElementById('summary-title').textContent = `📰 סיכום יום עסקים ${G.round}`;
+  document.getElementById('summary-subtitle').textContent = `מה קרה היום בשוק?`;
+  
+  // News
+  const newsEl = document.getElementById('summary-news');
+  newsEl.innerHTML = G.roundNews.map(n => {
+    const company = n.company ? COMPANIES.find(c => c.id === n.company) : null;
+    const effectPct = (n.effect * 100).toFixed(0);
+    const effectClass = n.effect > 0 ? 'change-up' : n.effect < 0 ? 'change-down' : 'change-neutral';
+    return `
+      <div class="news-card">
+        <div class="news-icon">${n.icon}</div>
+        <div class="news-body">
+          <div class="news-headline">${n.headline}</div>
+          <div class="news-effect">${company ? company.name : 'כל השוק'}</div>
+        </div>
+        <div class="news-pct ${effectClass}">${n.effect > 0 ? '+' : ''}${effectPct}%</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Leaderboard
+  const sorted = [...G.players].sort((a,b) => totalValue(b,G) - totalValue(a,G));
+  const medals = ['gold','silver','bronze'];
+  document.getElementById('leaderboard').innerHTML = sorted.map((p, i) => {
+    const tv = totalValue(p, G);
+    const prev = p.totalValueHistory.length >= 2 ? p.totalValueHistory[p.totalValueHistory.length - 2] : G.startCash;
+    const change = tv - prev;
+    const changePct = ((change / prev) * 100).toFixed(1);
+    return `
+      <div class="leaderboard-row">
+        <div class="rank-num ${medals[i]||''}">${['🥇','🥈','🥉'][i] || (i+1)}</div>
+        <div class="lb-av">${p.avatar}</div>
+        <div class="lb-name">${p.name}</div>
+        <div class="lb-val" style="color:${change>=0?'var(--green)':'var(--red)'}">${change>=0?'+':''}${changePct}%</div>
+        <div class="lb-val" style="color:var(--accent)">₪${fmt(tv)}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Find MVP
+  const mvpPlayer = G.players.reduce((best, p) => {
+    const tv = totalValue(p, G);
+    const prev = p.totalValueHistory.length >= 2 ? p.totalValueHistory[p.totalValueHistory.length - 2] : G.startCash;
+    const pct = (tv - prev) / prev;
+    const bestPrev = best.totalValueHistory.length >= 2 ? best.totalValueHistory[best.totalValueHistory.length - 2] : G.startCash;
+    const bestPct = (totalValue(best, G) - bestPrev) / bestPrev;
+    return pct > bestPct ? p : best;
+  });
+  
+  // Player summary cards
+  document.getElementById('players-summary').innerHTML = G.players.map(p => {
+    const tv = totalValue(p, G);
+    const prev = p.totalValueHistory.length >= 2 ? p.totalValueHistory[p.totalValueHistory.length - 2] : G.startCash;
+    const change = tv - prev;
+    const changePct = ((change / prev) * 100).toFixed(1);
+    const isMvp = p.id === mvpPlayer.id;
+    const actions = G.roundActions[p.id] || [];
+    
+    // FOMO detection - find if player sold before a surge
+    let fomoMsg = '';
+    actions.forEach(a => {
+      if (a.type === 'sell') {
+        const curPrice = G.stocks[a.company];
+        const soldFor = a.price;
+        if (curPrice && curPrice > soldFor * 1.1) {
+          fomoMsg = `😰 מכרת את ${a.company} - ואז היא עלתה! FOMO!`;
+        }
+      }
+    });
+    
+    return `
+      <div class="player-summary-card ${isMvp ? 'mvp' : ''}">
+        ${isMvp ? '<div class="mvp-badge">⭐ MVP יום</div>' : ''}
+        <div class="ps-avatar">${p.avatar}</div>
+        <div class="ps-name">${p.name}</div>
+        <div class="ps-total">₪${fmt(tv)}</div>
+        <div class="ps-change ${change >= 0 ? 'change-up' : 'change-down'}">${change >= 0 ? '+' : ''}${changePct}% היום</div>
+        <ul class="actions-log">
+          ${actions.length === 0 ? '<li class="action-item"><span class="alist-label">לא עשה כלום...</span></li>' : ''}
+          ${actions.slice(0, 5).map(a => {
+            const label = {
+              buy: `📈 קנה ${a.qty}× ${a.company}`,
+              sell: `📉 מכר ${a.qty}× ${a.company}`,
+              deposit: `🏦 הפקיד לחיסכון`,
+              withdraw: `💰 משך מחיסכון`,
+              loan: `💳 לקח הלוואה`,
+              repay: `✅ פרע הלוואה`,
+              insurance: `🛡️ קנה ביטוח`,
+              newssub: `📰 קנה מינוי חדשות`,
+              dividend: `💰 דיבידנד: ${a.company}`,
+              loaninterest: `💸 ריבית הלוואה`,
+              quest: `🎯 משימה הושלמה!`,
+            }[a.type] || a.type;
+            const val = a.total ? `₪${fmt(a.total)}` : a.amount ? `₪${fmt(a.amount)}` : '';
+            return `<li class="action-item"><span class="alist-label">${label}</span><span class="alist-val">${val}</span></li>`;
+          }).join('')}
+        </ul>
+        ${fomoMsg ? `<div class="fomo-tag">${fomoMsg}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+  
+  // Next day or end
+  const nextBtn = document.getElementById('next-day-btn');
+  if (G.round >= G.totalRounds) {
+    nextBtn.textContent = '🏁 סיום המשחק!';
+    nextBtn.onclick = () => { G.phase = 'end'; showEndScreen(); };
+  } else {
+    nextBtn.textContent = '☀️ עבור ליום העסקים הבא';
+    nextBtn.onclick = nextDay;
+  }
+}
+
+function nextDay() {
+  G.round++;
+  G.donePlayers = [];
+  G.currentPlayer = 0;
+  G.roundActions = {};
+  G.players.forEach(p => { G.roundActions[p.id] = []; });
+  G.phase = 'playing';
+  document.getElementById('current-day-label').textContent = G.round;
+  saveGame();
+  showGameScreen();
+}
+
+// ============================================================
+// END SCREEN
+// ============================================================
+function renderEnd() {
+  const sorted = [...G.players].sort((a,b) => totalValue(b,G) - totalValue(a,G));
+  const winner = sorted[0];
+  
+  document.getElementById('winner-trophy').textContent = winner.avatar;
+  document.getElementById('end-title').textContent = `🏆 ${winner.name} ניצח!`;
+  document.getElementById('end-subtitle').textContent = `לאחר ${G.totalRounds} ימי עסקים, הנה הדירוג הסופי:`;
+  
+  document.getElementById('end-leaderboard').innerHTML = sorted.map((p, i) => {
+    const tv = totalValue(p, G);
+    const gain = tv - G.startCash;
+    const pct = ((gain / G.startCash) * 100).toFixed(1);
+    const medals = ['🥇','🥈','🥉'];
+    return `
+      <div class="leaderboard-row" style="margin-bottom:10px">
+        <div class="rank-num" style="font-size:1.5rem">${medals[i] || (i+1)}</div>
+        <div style="font-size:2rem">${p.avatar}</div>
+        <div style="flex:1;text-align:right">
+          <div style="font-weight:800">${p.name}</div>
+          <div style="font-size:0.8rem;color:var(--text2)">₪${fmt(G.startCash)} → ₪${fmt(tv)}</div>
+        </div>
+        <div style="text-align:left">
+          <div class="mono" style="font-size:1.1rem;color:var(--accent)">₪${fmt(tv)}</div>
+          <div class="mono" style="font-size:0.85rem;color:${gain>=0?'var(--green)':'var(--red)'}">${gain>=0?'+':''}${pct}%</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ============================================================
+// NEWS TICKER
+// ============================================================
+function updateNewsTicker() {
+  const news = G.roundNews.length > 0 ? G.roundNews : generateNewsForRound(G.round);
+  const ticker = document.getElementById('news-ticker');
+  const items = [...news, ...news]; // double for seamless loop
+  ticker.innerHTML = items.map(n => `
+    <span class="news-item">
+      ${n.icon} <strong>${n.headline}</strong>
+      <span class="${n.effect > 0 ? 'up' : n.effect < 0 ? 'down' : ''}">${n.effect !== 0 ? (n.effect > 0 ? '▲' : '▼') + Math.abs((n.effect*100).toFixed(0)) + '%' : ''}</span>
+    </span>
+  `).join('');
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal() {
+  document.getElementById('modal-overlay').style.display = 'flex';
+}
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').style.display = 'none';
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type = 'green') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => { toast.remove(); }, 3100);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function fmt(n) {
+  const num = Math.round(n);
+  return num.toLocaleString('he-IL');
+}
+
+// ============================================================
+// LOGO MANAGER
+// ============================================================
+function openLogoManager() {
+  const grid = COMPANIES.map(c => {
+    const hasLogo = !!companyLogos[c.id];
+    return `
+      <div class="logo-item" onclick="triggerLogoUpload('${c.id}')">
+        <div class="logo-preview">
+          ${hasLogo ? `<img src="${companyLogos[c.id]}" alt="${c.name}">` : c.emoji}
+        </div>
+        <div class="logo-name">${c.name}</div>
+        <div class="logo-upload-hint">${hasLogo ? '✅ לחץ להחלפה' : '📁 לחץ להעלאה'}</div>
+        ${hasLogo ? `<button class="btn btn-danger btn-sm" style="margin-top:6px;padding:4px 10px;font-size:0.7rem" onclick="removeLogo(event,'${c.id}')">✕ הסר</button>` : ''}
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('modal-content').innerHTML = `
+    <h2>🖼️ ניהול לוגואים לחברות</h2>
+    <p style="color:var(--text2);font-size:0.85rem;margin-bottom:14px">לחץ על חברה להעלאת לוגו. אם לא הועלה לוגו — יוצג האייקון הרגיל.</p>
+    <div class="logo-manager-grid">${grid}</div>
+    <input type="file" id="logo-file-input" accept="image/*" style="display:none" onchange="handleLogoFile(event)">
+    <div style="margin-top:16px;display:flex;gap:10px">
+      <button class="btn btn-danger btn-sm" onclick="clearAllLogos()">🗑️ מחק כל הלוגואים</button>
+      <button class="btn btn-secondary" onclick="closeModal()">סגור</button>
+    </div>
+  `;
+  openModal();
+}
+
+let _currentLogoCompanyId = null;
+function triggerLogoUpload(companyId) {
+  _currentLogoCompanyId = companyId;
+  document.getElementById('logo-file-input').value = '';
+  document.getElementById('logo-file-input').click();
+}
+
+function handleLogoFile(event) {
+  const file = event.target.files[0];
+  if (!file || !_currentLogoCompanyId) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    companyLogos[_currentLogoCompanyId] = e.target.result;
+    saveLogos();
+    showToast('✅ לוגו הועלה בהצלחה!', 'green');
+    openLogoManager(); // re-render
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo(event, companyId) {
+  event.stopPropagation();
+  delete companyLogos[companyId];
+  saveLogos();
+  openLogoManager();
+}
+
+function clearAllLogos() {
+  if (!confirm('למחוק את כל הלוגואים?')) return;
+  companyLogos = {};
+  saveLogos();
+  openLogoManager();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', () => {
+  // Add default 2 players
+  addPlayer();
+  addPlayer();
+  
+  // Check for saved game
+  const saved = localStorage.getItem('borsa_save');
+  if (saved) {
+    document.getElementById('load-btn').style.display = 'inline-flex';
+    document.getElementById('reset-btn').style.display = 'inline-flex';
+  }
+});
+</script>
+</body>
+</html>
