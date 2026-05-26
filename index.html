@@ -819,12 +819,13 @@ hr.divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; 
 <div id="game-screen" class="screen">
   <div class="game-header">
     <div class="game-title">💹 בורסת הילדים</div>
-    <div id="header-player-cash" style="display:flex;align-items:center;gap:12px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:0.9rem">
-      <span id="header-player-avatar" style="font-size:1.2rem"></span>
-      <span id="header-player-name" style="color:var(--text2);font-weight:600"></span>
-      <span style="color:var(--text3)">|</span>
-      <span style="color:var(--text2);font-size:0.8rem">מזומן:</span>
-      <span id="header-cash-value" style="font-family:'Space Mono',monospace;font-weight:700;color:var(--green)"></span>
+    <div id="header-player-cash" style="display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:8px 18px;font-size:0.9rem">
+      <span id="header-player-avatar" style="font-size:1.4rem"></span>
+      <div style="display:flex;flex-direction:column;line-height:1.2">
+        <span id="header-player-name" style="color:var(--text2);font-weight:700;font-size:0.8rem"></span>
+        <span style="color:var(--text3);font-size:0.65rem;letter-spacing:1px">מזומן זמין לרכישות</span>
+      </div>
+      <span id="header-cash-value" style="font-family:'Space Mono',monospace;font-weight:800;font-size:1.1rem;color:var(--green);text-shadow:0 0 12px rgba(0,255,136,0.4)"></span>
     </div>
     <div class="day-badge">יום עסקים: <span id="current-day-label">1</span></div>
     <button class="btn btn-secondary btn-sm" onclick="endTurn()">✅ סיים תור</button>
@@ -1277,7 +1278,7 @@ function renderSidebar() {
     <div class="savings-card">
       <div class="savings-label">🏦 חיסכון בנקאי</div>
       <div class="savings-amount">₪${fmt(p.savings)}</div>
-      <div class="savings-info">${p.savingsRoundsLeft > 0 ? `נפתח בעוד ${p.savingsRoundsLeft} ימים` : 'זמין למשיכה'}</div>
+      <div class="savings-info">${p.savingsRoundsLeft > 0 ? `נפתח בעוד ${p.savingsRoundsLeft} סיבובים • +3% לסיבוב` : '✅ זמין למשיכה'}</div>
     </div>`;
   }
   
@@ -1297,6 +1298,7 @@ function renderSidebar() {
     <button class="btn btn-secondary btn-sm" onclick="openLoanModal()" style="justify-content:flex-start">💳 הלוואה</button>
     <button class="btn btn-secondary btn-sm" onclick="openInsuranceModal()" style="justify-content:flex-start">🛡️ ביטוח שוק</button>
     <button class="btn btn-secondary btn-sm" onclick="openNewsSubModal()" style="justify-content:flex-start">📰 מינוי חדשות מוקדמות</button>
+    <button class="btn btn-secondary btn-sm" onclick="openLogoManager()" style="justify-content:flex-start">🖼️ ניהול לוגואים</button>
     <button class="btn btn-primary btn-sm" onclick="endTurn()" style="margin-top:8px">✅ סיים תור →</button>
   `;
 }
@@ -1653,10 +1655,10 @@ function openBankModal() {
       ${p.savings > 0 ? `<div class="row"><span>ימים לפתיחה</span><span class="mono yellow">${p.savingsRoundsLeft}</span></div>` : ''}
     </div>
     <div class="tax-notice" style="border-color:rgba(0,229,255,0.3);color:var(--accent);background:rgba(0,229,255,0.1)">
-      💡 חיסכון בבנק מקבל ריבית של 3% לכל 5 סיבובים ואינו מושפע מהשוק. הכסף ננעל ל-5 סיבובים!
+      💡 חיסכון בבנק מקבל ריבית של 3% בכל סיבוב ואינו מושפע מהשוק. הכסף ננעל ל-5 סיבובים!
     </div>
     ${p.savings > 0 && p.savingsRoundsLeft === 0 ? `
-    <button class="btn btn-primary full-w mb-16" onclick="withdrawSavings()">📤 משוך את החיסכון (₪${fmt(Math.round(p.savings * 1.03))})</button>
+    <button class="btn btn-primary full-w mb-16" onclick="withdrawSavings()">📤 משוך את החיסכון (₪${fmt(p.savings)})</button>
     ` : ''}
     ${p.savings === 0 || p.savingsRoundsLeft === 0 ? `
     <div class="input-group">
@@ -1687,12 +1689,12 @@ function depositSavings() {
 function withdrawSavings() {
   const p = G.players[G.currentPlayer];
   if (p.savingsRoundsLeft > 0) { showToast('החיסכון עדיין נעול!', 'red'); return; }
-  const withInterest = Math.round(p.savings * 1.03);
+  const withInterest = p.savings; // interest already applied each round
   G.roundActions[p.id].push({ type:'withdraw', amount:withInterest });
   p.cash += withInterest;
   p.savings = 0;
   p.savingsRoundsLeft = 0;
-  showToast(`💰 משכת ₪${fmt(withInterest)} מהחיסכון (+3% ריבית)!`, 'green');
+  showToast(`💰 משכת ₪${fmt(withInterest)} מהחיסכון!`, 'green');
   saveGame(); renderSidebar(); closeModal();
 }
 
@@ -1935,7 +1937,12 @@ function processRoundEnd() {
       G.roundActions[p.id].push({ type:'loaninterest', amount:interest });
     }
     
-    // Savings unlock
+    // Savings: 3% interest every round while locked, then countdown
+    if (p.savings > 0 && p.savingsRoundsLeft > 0) {
+      const interest = Math.round(p.savings * 0.03);
+      p.savings += interest;
+      G.roundActions[p.id].push({ type:'savingsinterest', amount:interest });
+    }
     if (p.savingsRoundsLeft > 0) p.savingsRoundsLeft--;
     
     // News sub
@@ -2053,6 +2060,7 @@ function renderSummary() {
               newssub: `📰 קנה מינוי חדשות`,
               dividend: `💰 דיבידנד: ${a.company}`,
               loaninterest: `💸 ריבית הלוואה`,
+              savingsinterest: `📈 ריבית חיסכון (+3%)`,
               quest: `🎯 משימה הושלמה!`,
             }[a.type] || a.type;
             const val = a.total ? `₪${fmt(a.total)}` : a.amount ? `₪${fmt(a.amount)}` : '';
