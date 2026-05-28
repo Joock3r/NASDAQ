@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>בורסת הילדים 💰</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0e1a;--bg2:#111827;--bg3:#1a2235;--card:#151e2e;--card2:#1c2840;
+  --border:#2a3a55;--accent:#00e5ff;--accent2:#7c3aed;--green:#00ff88;
+  --red:#ff3366;--yellow:#ffd700;--orange:#ff8c00;
+  --text:#e8f0fe;--text2:#8899bb;--text3:#4a5a7a;
+  --radius:16px;--radius-sm:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;min-height:100vh;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg2);}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+
+/* SCREENS */
+.screen{display:none !important;position:relative;z-index:1;animation:fadeIn 0.4s ease;}
+.screen.active{display:block !important;}
+#setup-screen.active{display:flex !important;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* SETUP */
+#setup-screen{min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;}
+.logo{text-align:center;margin-bottom:40px;}
+.logo h1{font-size:clamp(2.2rem,6vw,4rem);font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;}
+.logo p{color:var(--text2);font-size:1.1rem;margin-top:8px;}
+.setup-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:100%;max-width:580px;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.section-title{font-size:0.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px;}
+.input-group{margin-bottom:18px;}
+.input-group label{display:block;font-size:0.88rem;color:var(--text2);margin-bottom:7px;font-weight:500;}
+.input-group input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 14px;color:var(--text);font-family:'Heebo',sans-serif;font-size:1rem;transition:border-color .2s,box-shadow .2s;text-align:right;}
+.input-group input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,229,255,0.1);}
+.players-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
+.player-row{display:flex;gap:10px;align-items:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.player-row input{flex:1;background:transparent;border:none;color:var(--text);font-family:'Heebo',sans-serif;font-size:1rem;text-align:right;}
+.player-row input:focus{outline:none;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Heebo',sans-serif;font-size:0.95rem;font-weight:700;transition:all .2s;text-decoration:none;}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#0099bb);color:#000;box-shadow:0 4px 20px rgba(0,229,255,0.3);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,255,0.4);}
+.btn-secondary{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent);}
+.btn-danger{background:rgba(255,51,102,0.15);color:var(--red);border:1px solid rgba(255,51,102,0.3);}
+.btn-danger:hover{background:rgba(255,51,102,0.25);}
+.btn-success{background:linear-gradient(135deg,var(--green),#00aa55);color:#000;box-shadow:0 4px 20px rgba(0,255,136,0.3);}
+.btn-success:hover{transform:translateY(-2px);}
+.btn-sm{padding:7px 14px;font-size:0.82rem;}
+.btn-icon{width:34px;height:34px;padding:0;border-radius:50%;font-size:1rem;background:rgba(255,51,102,0.15);color:var(--red);border:1px solid rgba(255,51,102,0.3);}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important;}
+.full-w{width:100%;}
+.mt-16{margin-top:16px;}.mb-16{margin-bottom:16px;}
+.flex{display:flex;}.flex-center{align-items:center;justify-content:center;}.gap-10{gap:10px;}
+
+/* GAME HEADER */
+.game-header{background:var(--card);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);flex-wrap:wrap;gap:8px;}
+.game-title{font-weight:800;font-size:1.15rem;color:var(--accent);}
+.day-badge{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:0.82rem;color:var(--text2);}
+.day-badge span{color:var(--yellow);font-weight:700;font-family:'Space Mono',monospace;}
+#header-player-cash{display:flex;align-items:center;gap:10px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:7px 16px;}
+#header-player-name{color:var(--text2);font-weight:700;font-size:0.78rem;}
+#header-cash-value{font-family:'Space Mono',monospace;font-weight:800;font-size:1.05rem;color:var(--green);text-shadow:0 0 12px rgba(0,255,136,0.4);}
+
+/* TICKER */
+.news-ticker-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:7px 0;overflow:hidden;}
+.news-ticker{display:flex;gap:50px;animation:ticker 40s linear infinite;white-space:nowrap;width:max-content;}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.news-item{font-size:0.78rem;color:var(--text2);padding:0 10px;}
+.news-item strong{color:var(--text);}
+.news-item .up{color:var(--green);}.news-item .down{color:var(--red);}
+
+/* PLAYER TABS */
+.player-tabs{display:flex;gap:0;background:var(--bg2);border-bottom:1px solid var(--border);overflow-x:auto;padding:0 14px;}
+.player-tab{padding:12px 18px;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;font-weight:600;font-size:0.86rem;color:var(--text2);transition:all .2s;display:flex;align-items:center;gap:7px;}
+.player-tab:hover{color:var(--text);}
+.player-tab.active{border-bottom-color:var(--accent);color:var(--accent);}
+.player-tab.done-tab{opacity:.6;}
+.tab-value{font-family:'Space Mono',monospace;font-size:0.72rem;background:var(--bg3);padding:2px 7px;border-radius:10px;}
+.tab-done{font-size:0.75rem;color:var(--green) !important;}
+
+/* GAME MAIN */
+.game-main{display:grid;grid-template-columns:290px 1fr;min-height:calc(100vh - 115px);}
+
+/* SIDEBAR */
+.sidebar{background:var(--card);border-left:1px solid var(--border);padding:18px;overflow-y:auto;}
+.player-profile{text-align:center;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:18px;}
+.player-avatar-big{font-size:2.8rem;margin-bottom:6px;}
+.player-name-big{font-size:1.2rem;font-weight:800;}
+.player-cash{font-family:'Space Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--green);margin:4px 0;}
+.player-cash-label{font-size:0.72rem;color:var(--text2);}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--bg3);font-size:0.83rem;}
+.stat-label{color:var(--text2);}
+.stat-val{font-family:'Space Mono',monospace;font-weight:700;}
+.stat-val.green{color:var(--green);}.stat-val.red{color:var(--red);}.stat-val.yellow{color:var(--yellow);}
+.div-meter-wrap{margin-top:18px;}
+.div-meter-bar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;margin:7px 0;}
+.div-meter-fill{height:100%;border-radius:4px;transition:width .5s ease;}
+.sidebar-actions{margin-top:18px;display:flex;flex-direction:column;gap:9px;}
+.quest-card{background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(124,58,237,.05));border:1px solid rgba(124,58,237,.4);border-radius:var(--radius-sm);padding:12px;margin-top:14px;}
+.quest-title{font-size:0.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--accent2);margin-bottom:5px;font-weight:700;}
+.quest-desc{font-size:0.82rem;color:var(--text);margin-bottom:6px;}
+.quest-reward{font-size:0.78rem;color:var(--yellow);}
+.portfolio-list{display:flex;flex-direction:column;gap:5px;margin-top:10px;}
+.port-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 9px;font-size:0.78rem;}
+.port-item-top{display:flex;justify-content:space-between;font-weight:700;}
+.port-item-bot{display:flex;justify-content:space-between;margin-top:2px;color:var(--text2);}
+.savings-card{background:linear-gradient(135deg,rgba(0,229,255,.1),rgba(0,229,255,.03));border:1px solid rgba(0,229,255,.3);border-radius:var(--radius-sm);padding:11px;margin-top:9px;}
+.savings-label{font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:5px;font-weight:700;}
+.savings-amount{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--accent);}
+.savings-info{font-size:0.72rem;color:var(--text2);margin-top:2px;}
+
+/* MARKET */
+.market-area{padding:18px;overflow-y:auto;}
+.market-search{display:flex;gap:9px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+.market-search input{flex:1;min-width:160px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 13px;color:var(--text);font-family:'Heebo',sans-serif;font-size:0.88rem;text-align:right;}
+.market-search input:focus{outline:none;border-color:var(--accent);}
+.filter-pills{display:flex;gap:5px;flex-wrap:wrap;}
+.pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:0.77rem;cursor:pointer;background:var(--bg2);color:var(--text2);transition:all .2s;}
+.pill.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700;}
+.pill:hover:not(.active){border-color:var(--accent);color:var(--accent);}
+.stocks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:13px;}
+
+/* STOCK CARD */
+.stock-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:15px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;}
+.stock-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:0;transition:opacity .2s;}
+.stock-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 10px 40px rgba(0,0,0,.4);}
+.stock-card:hover::before{opacity:1;}
+.stock-card.owned{border-color:rgba(0,255,136,.4);}
+.stock-card.owned::before{opacity:1;background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.stock-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+.stock-logo-wrap{width:48px;height:48px;display:flex;align-items:center;justify-content:center;background:white;border-radius:8px;overflow:hidden;padding:4px;}
+.stock-logo-wrap img{width:100%;height:100%;object-fit:contain;}
+.stock-emoji-fallback{font-size:2rem;width:48px;height:48px;display:flex;align-items:center;justify-content:center;}
+.stock-name{font-weight:800;font-size:0.92rem;margin-bottom:2px;}
+.stock-category{font-size:0.68rem;color:var(--text2);}
+.stock-risk{font-size:0.62rem;padding:2px 7px;border-radius:10px;font-weight:700;letter-spacing:1px;}
+.risk-stable{background:rgba(0,255,136,.15);color:var(--green);}
+.risk-volatile{background:rgba(255,140,0,.15);color:var(--orange);}
+.risk-very-volatile{background:rgba(255,51,102,.15);color:var(--red);}
+.stock-price-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
+.stock-price{font-family:'Space Mono',monospace;font-size:1.2rem;font-weight:700;}
+.stock-change{font-family:'Space Mono',monospace;font-size:0.82rem;font-weight:700;padding:3px 9px;border-radius:7px;}
+.change-up{background:rgba(0,255,136,.15);color:var(--green);}
+.change-down{background:rgba(255,51,102,.15);color:var(--red);}
+.change-neutral{background:rgba(255,215,0,.1);color:var(--yellow);}
+.mini-chart{height:38px;position:relative;margin-bottom:9px;}
+.mini-chart canvas{width:100% !important;height:38px !important;}
+.stock-owned-badge{font-size:0.72rem;color:var(--green);margin-bottom:7px;display:flex;align-items:center;gap:3px;}
+.stock-actions{display:flex;gap:7px;}
+.buy-btn{flex:1;padding:7px;background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);border-radius:7px;color:var(--green);font-family:'Heebo',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all .2s;}
+.buy-btn:hover{background:rgba(0,255,136,.2);}
+.sell-btn{flex:1;padding:7px;background:rgba(255,51,102,.1);border:1px solid rgba(255,51,102,.3);border-radius:7px;color:var(--red);font-family:'Heebo',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all .2s;}
+.sell-btn:hover{background:rgba(255,51,102,.2);}
+.sell-btn:disabled{opacity:.3;cursor:not-allowed;}
+@keyframes flashGreen{0%,100%{background:var(--card)}50%{background:rgba(0,255,136,.2)}}
+@keyframes flashRed{0%,100%{background:var(--card)}50%{background:rgba(255,51,102,.2)}}
+.flash-green{animation:flashGreen .6s ease;}
+.flash-red{animation:flashRed .6s ease;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:18px;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:26px;max-width:480px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,.7);animation:modalIn .3s ease;max-height:92vh;overflow-y:auto;}
+@keyframes modalIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.modal h2{font-size:1.3rem;font-weight:800;margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.modal-info{background:var(--bg2);border-radius:var(--radius-sm);padding:14px;margin-bottom:14px;}
+.modal-info .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bg3);font-size:0.88rem;}
+.modal-info .row:last-child{border:none;}
+.qty-control{display:flex;align-items:center;gap:11px;margin:14px 0;}
+.qty-btn{width:38px;height:38px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-size:1.15rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.qty-btn:hover{border-color:var(--accent);color:var(--accent);}
+.qty-display{font-family:'Space Mono',monospace;font-size:1.4rem;font-weight:700;flex:1;text-align:center;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px;}
+.total-cost{font-family:'Space Mono',monospace;font-size:1.05rem;font-weight:700;text-align:center;padding:9px;border-radius:var(--radius-sm);background:var(--bg2);border:1px solid var(--border);margin-bottom:14px;}
+.tax-notice{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);border-radius:var(--radius-sm);padding:9px 13px;font-size:0.78rem;color:var(--yellow);margin-bottom:14px;}
+
+/* SUMMARY */
+#summary-screen{min-height:100vh;padding:26px 18px;max-width:980px;margin:0 auto;}
+.summary-header{text-align:center;margin-bottom:26px;}
+.summary-header h1{font-size:1.9rem;font-weight:900;}
+.summary-header p{color:var(--text2);margin-top:5px;}
+.news-event-cards{display:flex;flex-direction:column;gap:10px;margin-bottom:26px;}
+.news-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;display:flex;align-items:center;gap:14px;}
+.news-card .news-icon{font-size:1.9rem;}
+.news-card .news-body{flex:1;}
+.news-card .news-headline{font-weight:700;margin-bottom:3px;}
+.news-card .news-effect{font-size:0.82rem;color:var(--text2);}
+.news-card .news-future{font-size:0.72rem;color:var(--accent2);margin-top:3px;}
+.news-card .news-pct{font-family:'Space Mono',monospace;font-weight:700;font-size:1.05rem;}
+
+/* STOCKS RANKING TABLE in summary */
+.stocks-ranking{display:flex;flex-direction:column;gap:6px;margin-bottom:26px;}
+.sr-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;}
+.sr-logo{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:white;border-radius:6px;overflow:hidden;padding:3px;flex-shrink:0;}
+.sr-logo img{width:100%;height:100%;object-fit:contain;}
+.sr-emoji{font-size:1.5rem;width:36px;text-align:center;flex-shrink:0;}
+.sr-name{font-weight:700;font-size:0.88rem;flex:1;}
+.sr-price{font-family:'Space Mono',monospace;font-size:0.88rem;color:var(--text2);}
+.sr-change{font-family:'Space Mono',monospace;font-size:0.88rem;font-weight:700;padding:3px 9px;border-radius:6px;min-width:70px;text-align:center;}
+
+/* PLAYER SUMMARY CARDS */
+.players-summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:26px;}
+.player-summary-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;position:relative;overflow:hidden;}
+.player-summary-card.mvp{border-color:var(--yellow);box-shadow:0 0 30px rgba(255,215,0,.2);}
+.mvp-badge{position:absolute;top:10px;left:10px;background:var(--yellow);color:#000;font-size:0.62rem;font-weight:800;padding:2px 7px;border-radius:10px;letter-spacing:1px;}
+.ps-avatar{font-size:2.3rem;margin-bottom:7px;}
+.ps-name{font-size:1.05rem;font-weight:800;margin-bottom:3px;}
+.ps-total{font-family:'Space Mono',monospace;font-size:1.3rem;font-weight:700;color:var(--accent);margin-bottom:7px;}
+.ps-change{font-family:'Space Mono',monospace;font-size:0.86rem;font-weight:700;padding:3px 9px;border-radius:7px;display:inline-block;margin-bottom:10px;}
+.ps-breakdown{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;}
+.ps-breakdown-row{display:flex;justify-content:space-between;font-size:0.78rem;}
+.ps-breakdown-row span:first-child{color:var(--text2);}
+.ps-breakdown-row span:last-child{font-family:'Space Mono',monospace;font-weight:700;}
+.actions-log{list-style:none;}
+.action-item{padding:5px 0;border-bottom:1px solid var(--bg3);font-size:0.77rem;color:var(--text2);display:flex;justify-content:space-between;}
+.action-item:last-child{border:none;}
+.alist-val{font-family:'Space Mono',monospace;font-size:0.72rem;}
+.fomo-tag{margin-top:9px;background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.3);border-radius:var(--radius-sm);padding:7px 11px;font-size:0.75rem;color:var(--orange);}
+.leaderboard-section{margin-bottom:26px;}
+.leaderboard-row{display:flex;align-items:center;gap:13px;padding:11px 15px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:7px;transition:all .2s;}
+.leaderboard-row:hover{border-color:var(--accent);}
+.rank-num{font-family:'Space Mono',monospace;font-size:1.1rem;font-weight:700;color:var(--text3);width:28px;text-align:center;}
+.rank-num.gold{color:var(--yellow);}.rank-num.silver{color:#aaa;}.rank-num.bronze{color:#cd7f32;}
+.lb-av{font-size:1.7rem;}
+.lb-name{font-weight:700;flex:1;}
+.lb-val{font-family:'Space Mono',monospace;font-size:0.95rem;font-weight:700;}
+
+/* END SCREEN */
+#end-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 18px;text-align:center;}
+.winner-trophy{font-size:5.5rem;animation:bounce 1s ease infinite alternate;}
+@keyframes bounce{to{transform:translateY(-14px)}}
+#end-screen h1{font-size:2.3rem;font-weight:900;margin:18px 0 9px;}
+#end-screen p{color:var(--text2);font-size:1.05rem;margin-bottom:26px;}
+.end-leaderboard{width:100%;max-width:500px;}
+
+/* TOAST */
+#toast-container{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column-reverse;gap:7px;pointer-events:none;}
+.toast{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 18px;font-size:0.88rem;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:toastIn .3s ease,toastOut .3s ease 2.7s forwards;max-width:420px;text-align:center;}
+.toast.green{border-color:rgba(0,255,136,.5);color:var(--green);}
+.toast.red{border-color:rgba(255,51,102,.5);color:var(--red);}
+.toast.yellow{border-color:rgba(255,215,0,.5);color:var(--yellow);}
+@keyframes toastIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-10px)}}
+
+/* MISC */
+hr.divider{border:none;border-top:1px solid var(--border);margin:14px 0;}
+.text-center{text-align:center;}.text-muted{color:var(--text2);font-size:0.83rem;}
+.mono{font-family:'Space Mono',monospace;}
+.tag{display:inline-block;font-size:0.62rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 5px;border-radius:4px;}
+.tag-cat{background:rgba(124,58,237,.2);color:#a78bfa;}
+.badge-green{background:rgba(0,255,136,.15);color:var(--green);display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+.badge-red{background:rgba(255,51,102,.15);color:var(--red);display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+.badge-yellow{background:rgba(255,215,0,.15);color:var(--yellow);display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+.badge-blue{background:rgba(0,229,255,.15);color:var(--accent);display:inline-block;padding:2px 9px;border-radius:10px;font-size:0.68rem;font-weight:700;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .game-main{grid-template-columns:1fr;}
+  .sidebar{border-left:none;border-bottom:1px solid var(--border);max-height:none;}
+  .stocks-grid{grid-template-columns:1fr;}
+  .game-header{padding:9px 13px;}
+  .game-title{font-size:0.95rem;}
+  #header-player-cash{font-size:0.78rem;padding:5px 11px;}
+  .player-tabs{padding:0 7px;}
+  .player-tab{padding:9px 11px;font-size:0.78rem;}
+  .market-area{padding:11px;}
+  .setup-card{padding:18px 15px;}
+  .players-summary-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="toast-container"></div>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen" class="screen active">
+  <div class="logo">
+    <h1>💹 בורסת הילדים</h1>
+    <p>למד להשקיע, לנהל כסף, ולהתעשר! 🚀</p>
+  </div>
+  <div class="setup-card">
+    <div class="section-title">⚙️ הגדרות משחק</div>
+    <div class="input-group">
+      <label>כמות כסף התחלתית לכל שחקן (₪)</label>
+      <input type="number" id="start-cash" value="10000" min="1000" max="100000" step="1000">
+    </div>
+    <div class="input-group">
+      <label>מספר סיבובים (ימי עסקים)</label>
+      <input type="number" id="num-rounds" value="10" min="3" max="30">
+    </div>
+    <hr class="divider">
+    <div class="section-title">👥 שחקנים</div>
+    <div class="players-list" id="players-list"></div>
+    <button class="btn btn-secondary btn-sm" onclick="addPlayer()">➕ הוסף שחקן</button>
+    <hr class="divider">
+    <div style="display:flex;gap:9px;flex-wrap:wrap;">
+      <button class="btn btn-primary full-w" onclick="startGame()">🚀 התחל משחק!</button>
+      <button class="btn btn-secondary btn-sm" onclick="loadGame()" id="load-btn" style="display:none">📂 המשך משחק שמור</button>
+    </div>
+    <button class="btn btn-danger btn-sm mt-16 full-w" onclick="resetSave()" id="reset-btn" style="display:none">🗑️ מחק שמירה</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="game-screen" class="screen">
+  <div class="game-header">
+    <div class="game-title">💹 בורסת הילדים</div>
+    <div id="header-player-cash">
+      <span id="header-player-avatar" style="font-size:1.35rem"></span>
+      <div style="display:flex;flex-direction:column;line-height:1.2">
+        <span id="header-player-name"></span>
+        <span style="color:var(--text3);font-size:0.62rem;letter-spacing:1px">מזומן זמין לרכישות</span>
+      </div>
+      <span id="header-cash-value"></span>
+    </div>
+    <div class="day-badge">יום: <span id="current-day-label">1</span></div>
+    <button class="btn btn-secondary btn-sm" onclick="endTurn()">✅ סיים תור</button>
+  </div>
+  <div class="news-ticker-wrap">
+    <div class="news-ticker" id="news-ticker"><span class="news-item">⏳ טוען חדשות...</span></div>
+  </div>
+  <div class="player-tabs" id="player-tabs"></div>
+  <div class="game-main">
+    <div class="sidebar" id="sidebar">
+      <div class="player-profile" id="player-profile"></div>
+      <div id="portfolio-section"></div>
+      <div id="sidebar-features"></div>
+      <div id="quest-section"></div>
+      <div class="sidebar-actions" id="sidebar-actions"></div>
+    </div>
+    <div class="market-area">
+      <div class="market-search">
+        <input type="text" id="search-input" placeholder="🔍 חפש חברה..." oninput="filterStocks()">
+        <div class="filter-pills" id="filter-pills"></div>
+      </div>
+      <div class="stocks-grid" id="stocks-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY SCREEN -->
+<div id="summary-screen" class="screen">
+  <div style="max-width:1100px;margin:0 auto;padding:26px 18px;">
+    <div class="summary-header">
+      <h1 id="summary-title">📰 סיכום יום עסקים</h1>
+      <p id="summary-subtitle"></p>
+    </div>
+    <div class="section-title">📰 חדשות שהשפיעו על השוק היום</div>
+    <div class="news-event-cards" id="summary-news"></div>
+    <hr class="divider">
+    <div class="section-title">📊 כל המניות — ממוין לפי שינוי יומי</div>
+    <div id="stocks-ranking" style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;overflow-x:auto"></div>
+    <hr class="divider">
+    <div class="section-title">🏆 טבלת מובילים</div>
+    <div class="leaderboard-section" id="leaderboard"></div>
+    <hr class="divider">
+    <div class="section-title">👤 סיכום מפורט — כל שחקן</div>
+    <div class="players-summary-grid" id="players-summary"></div>
+    <div class="text-center mt-16 mb-16">
+      <button class="btn btn-primary" style="font-size:1.1rem;padding:16px 40px;" id="next-day-btn" onclick="nextDay()">☀️ עבור ליום העסקים הבא</button>
+    </div>
+  </div>
+</div>
+
+<!-- END SCREEN -->
+<div id="end-screen" class="screen">
+  <div class="winner-trophy" id="winner-trophy">🏆</div>
+  <h1 id="end-title">המשחק הסתיים!</h1>
+  <p id="end-subtitle"></p>
+  <div class="end-leaderboard" id="end-leaderboard"></div>
+  <button class="btn btn-primary mt-16" onclick="goToSetup()">🔄 משחק חדש</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" style="display:none" onclick="closeModal(event)">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+// ============================================================
+// 32 COMPANIES with logos & category emojis
+// ============================================================
+const COMPANIES = [
+  // גיימינג וקונסולות
+  {id:'nintendo',name:'נינטנדו',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Nintendo.svg/960px-Nintendo.svg.png',emoji:'🎮',category:'גיימינג',risk:'volatile',basePrice:200},
+  {id:'playstation',name:'פלייסטיישן',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Playstation_logo_colour.svg/960px-Playstation_logo_colour.svg.png',emoji:'🕹️',category:'גיימינג',risk:'volatile',basePrice:220},
+  // משחקי הרכבה ומחשבה
+  {id:'lego',name:'לגו',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/LEGO_logo.svg/960px-LEGO_logo.svg.png',emoji:'🧱',category:'צעצועים',risk:'stable',basePrice:140},
+  {id:'foxmind',name:'פוקסמיינד',logo:'https://upload.wikimedia.org/wikipedia/he/1/1a/%D7%A1%D7%9E%D7%9C%D7%99%D7%9C_FoxMind.svg',emoji:'🧩',category:'צעצועים',risk:'stable',basePrice:75},
+  // רשתות צעצועים
+  {id:'toysrus',name:'טויס אר אס',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Toys_%22R%22_Us_logo.svg/960px-Toys_%22R%22_Us_logo.svg.png',emoji:'🧸',category:'צעצועים',risk:'volatile',basePrice:90},
+  {id:'idan2000',name:'עידן 2000',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/e/eb/%D7%A1%D7%9E%D7%9C%D7%99%D7%9C_%D7%A2%D7%99%D7%93%D7%9F_2000_2019.png/960px-%D7%A1%D7%9E%D7%9C%D7%99%D7%9C_%D7%A2%D7%99%D7%93%D7%9F_2000_2019.png?_=20260318105554',emoji:'🎁',category:'צעצועים',risk:'volatile',basePrice:60},
+  // רשתות אופנה
+  {id:'fox',name:'פוקס',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/d/d3/FOX_New_Logo.svg/250px-FOX_New_Logo.svg.png',emoji:'🦊',category:'אופנה',risk:'volatile',basePrice:68},
+  {id:'golf',name:'גולף',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/9/94/Golf%26Co_logo.png/250px-Golf%26Co_logo.png',emoji:'👕',category:'אופנה',risk:'volatile',basePrice:72},
+  // נעליים
+  {id:'nike',name:'נייקי',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Logo_NIKE.svg/250px-Logo_NIKE.svg.png',emoji:'👟',category:'אופנה',risk:'stable',basePrice:175},
+  {id:'adidas',name:'אדידס',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Adidas_2022_logo.svg/250px-Adidas_2022_logo.svg.png',emoji:'⚽',category:'אופנה',risk:'stable',basePrice:165},
+  // מסעדות
+  {id:'golda',name:'גולדה',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Golda_Glida_Logo.jpg/250px-Golda_Glida_Logo.jpg',emoji:'🍦',category:'מסעדות',risk:'volatile',basePrice:45},
+  {id:'mcdonalds',name:'מקדונלד׳ס',logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/250px-McDonald%27s_Golden_Arches.svg.png",emoji:'🍔',category:'מסעדות',risk:'stable',basePrice:180},
+  {id:'river',name:'ריבר',logo:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDWGpS981tsRwhgXQCCtupyJ5q8Sc7MTr8EA&s',emoji:'🍕',category:'מסעדות',risk:'volatile',basePrice:60},
+  // בידור ומדיה
+  {id:'disney',name:'דיסני',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/5/57/Walt_Disney_Pictures_2011_logo.svg/330px-Walt_Disney_Pictures_2011_logo.svg.png?_=20241228094008',emoji:'🏰',category:'בידור',risk:'stable',basePrice:160},
+  {id:'youtube',name:'יוטיוב',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/YouTube_2024.svg/960px-YouTube_2024.svg.png',emoji:'▶️',category:'בידור',risk:'stable',basePrice:310},
+  {id:'netflix',name:'נטפליקס',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/250px-Netflix_2015_logo.svg.png',emoji:'🎬',category:'בידור',risk:'volatile',basePrice:250},
+  // תקשורת
+  {id:'cellcom',name:'סלקום',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/9/99/%D7%A1%D7%9C%D7%A7%D7%95%D7%9D_2022.svg/1920px-%D7%A1%D7%9C%D7%A7%D7%95%D7%9D_2022.svg.png',emoji:'📱',category:'תקשורת',risk:'volatile',basePrice:78},
+  // ספרים
+  {id:'steimatzki',name:'סטימצקי',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/b/bc/Steimatzki.svg/250px-Steimatzki.svg.png',emoji:'📚',category:'ספרים',risk:'stable',basePrice:65},
+  {id:'tzometsefarim',name:'צומת ספרים',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/9/96/%D7%A6%D7%95%D7%9E%D7%AA_%D7%A1%D7%A4%D7%A8%D7%99%D7%9D.svg/250px-%D7%A6%D7%95%D7%9E%D7%AA_%D7%A1%D7%A4%D7%A8%D7%99%D7%9D.svg.png',emoji:'📖',category:'ספרים',risk:'stable',basePrice:55},
+  // יצירה ופנאי
+  {id:'jumbo',name:'ג׳אמבו',logo:'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Jumbo.png/250px-Jumbo.png',emoji:'🎨',category:'פנאי',risk:'volatile',basePrice:72},
+  {id:'maxstock',name:'מקס סטוק',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/c/cf/%D7%9C%D7%95%D7%92%D7%95_%D7%9E%D7%A7%D7%A1.jpeg/250px-%D7%9C%D7%95%D7%92%D7%95_%D7%9E%D7%A7%D7%A1.jpeg',emoji:'🛍️',category:'פנאי',risk:'volatile',basePrice:42},
+  // אוכל
+  {id:'tnuva',name:'תנובה',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/e/e9/Tnuva_New_Logo.svg/250px-Tnuva_New_Logo.svg.png',emoji:'🥛',category:'מזון',risk:'stable',basePrice:95},
+  {id:'strauss',name:'שטראוס',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/2/20/StraussNewLogo.svg/250px-StraussNewLogo.svg.png',emoji:'🍫',category:'מזון',risk:'stable',basePrice:85},
+  {id:'tera',name:'טרה',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/e/e1/%D7%A1%D7%9E%D7%9C%D7%99%D7%9C_%D7%98%D7%A8%D7%94_2023.svg/250px-%D7%A1%D7%9E%D7%9C%D7%99%D7%9C_%D7%98%D7%A8%D7%94_2023.svg.png',emoji:'🧃',category:'מזון',risk:'stable',basePrice:70},
+  // סופרמרקט
+  {id:'osheraad',name:'אושר עד',logo:'https://upload.wikimedia.org/wikipedia/he/1/19/%D7%90%D7%95%D7%A9%D7%A8_%D7%A2%D7%93.png',emoji:'🛒',category:'סופרמרקט',risk:'stable',basePrice:88},
+  {id:'hazihinam',name:'חצי חינם',logo:'https://upload.wikimedia.org/wikipedia/he/0/0f/Hazi-Hinam_logo.png',emoji:'🏷️',category:'סופרמרקט',risk:'stable',basePrice:72},
+  {id:'superpharm',name:'סופר-פארם',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/8/8d/Super_Pharm_Logo.svg/1920px-Super_Pharm_Logo.svg.png',emoji:'💊',category:'סופרמרקט',risk:'stable',basePrice:110},
+  // אנרגיה
+  {id:'delek',name:'דלק',logo:'https://upload.wikimedia.org/wikipedia/he/c/c5/Delek_new_logo.svg',emoji:'⛽',category:'אנרגיה',risk:'volatile',basePrice:130},
+  {id:'electric',name:'חברת החשמל',logo:'https://upload.wikimedia.org/wikipedia/he/thumb/1/1f/IsraelElectric.svg/250px-IsraelElectric.svg.png',emoji:'⚡',category:'אנרגיה',risk:'stable',basePrice:105},
+];
+
+const CATEGORIES = ['הכל','גיימינג','צעצועים','אופנה','מסעדות','בידור','תקשורת','ספרים','פנאי','מזון','סופרמרקט','אנרגיה'];
+
+// ============================================================
+// ~300 NEWS EVENTS
+// ============================================================
+const NEWS_EVENTS = [
+// ============================================================
+// חיוביים - חברה ספציפית
+// ============================================================
+{h:'🎮 נינטנדו מכריזה על מריו חדש מדהים!',c:'nintendo',e:0.14,icon:'⭐',future:false},
+{h:'🕹️ פלייסטיישן 6 נחשפת רשמית!',c:'playstation',e:0.22,icon:'🎮',future:false},
+{h:'🧱 לגו משיקה סט הארי פוטר ענק!',c:'lego',e:0.17,icon:'🪄',future:false},
+{h:'🧩 פוקסמיינד זוכה בפרס משחק השנה הבינלאומי!',c:'foxmind',e:0.20,icon:'🏆',future:false},
+{h:'🧸 טויס אר אס פותחת 10 סניפים חדשים!',c:'toysrus',e:0.12,icon:'🏪',future:false},
+{h:'🎁 עידן 2000 מכריזה על מבצע ענק!',c:'idan2000',e:0.15,icon:'🎉',future:false},
+{h:'🦊 פוקס משיקה קולקציית קיץ מנצחת!',c:'fox',e:0.13,icon:'☀️',future:false},
+{h:'👕 גולף פותחת 5 חנויות חדשות',c:'golf',e:0.11,icon:'🏪',future:false},
+{h:'👟 נייקי חותמת עם שחקן כדורגל-על!',c:'nike',e:0.15,icon:'⚽',future:false},
+{h:'⚽ אדידס ספונסרית גביע עולמי!',c:'adidas',e:0.12,icon:'🌍',future:false},
+{h:'🌡️ גל חום — גלידת גולדה נמכרת כמו חמה!',c:'golda',e:0.25,icon:'☀️',future:false},
+{h:'🍔 מקדונלד׳ס מוסיפה בורגר ישראלי מיוחד!',c:'mcdonalds',e:0.09,icon:'🥙',future:false},
+{h:'🍕 ריבר מגיעה לתל-אביב עם סניף ענק!',c:'river',e:0.22,icon:'🎉',future:false},
+{h:'🏰 דיסני+ מגיעה עם עונה חדשה!',c:'disney',e:0.14,icon:'🎥',future:false},
+{h:'▶️ יוטיוב מכריזה על פרמיום מופחת!',c:'youtube',e:0.10,icon:'📢',future:false},
+{h:'🎬 נטפליקס שוברת שיא מנויים עולמי!',c:'netflix',e:0.16,icon:'📈',future:false},
+{h:'📱 סלקום מציעה 5G חינם לחודש!',c:'cellcom',e:0.13,icon:'📶',future:false},
+{h:'📚 סטימצקי פותחת בקפה ספרים חדשני!',c:'steimatzki',e:0.14,icon:'☕',future:false},
+{h:'📖 צומת ספרים — בונוס ספר חינם לרוכשים!',c:'tzometsefarim',e:0.11,icon:'🎁',future:false},
+{h:'🎨 ג׳אמבו משיקה ערכת ציור VR!',c:'jumbo',e:0.19,icon:'🥽',future:false},
+{h:'🛍️ מקס סטוק — מכירת פסח ענקית!',c:'maxstock',e:0.18,icon:'🛒',future:false},
+{h:'🥛 תנובה חוזרת למותג מס׳ 1!',c:'tnuva',e:0.10,icon:'🏅',future:false},
+{h:'🍫 שטראוס משיקה שוקולד בטעם פיסטוק!',c:'strauss',e:0.15,icon:'🤩',future:false},
+{h:'🧃 טרה מכריזה על מיץ אנרגיה חדש!',c:'tera',e:0.13,icon:'⚡',future:false},
+{h:'🛒 אושר עד פותחת קו אורגני!',c:'osheraad',e:0.12,icon:'🌿',future:false},
+{h:'🏷️ חצי חינם — 50% הנחה על כל הסל!',c:'hazihinam',e:0.20,icon:'🎉',future:false},
+{h:'💊 סופר-פארם מרחיבה לקוסמטיקה יוקרתית!',c:'superpharm',e:0.09,icon:'💄',future:false},
+{h:'⛽ דלק מגלה מאגר גז חדש בים התיכון!',c:'delek',e:0.18,icon:'💡',future:false},
+{h:'⚡ חברת החשמל עוברת לאנרגיה ירוקה!',c:'electric',e:0.14,icon:'🌱',future:false},
+{h:'🎮 נינטנדו שוברת שיא מכירות בחנוכה!',c:'nintendo',e:0.16,icon:'🕎',future:false},
+{h:'🕹️ פלייסטיישן — משחק בלעדי חדש משגע!',c:'playstation',e:0.14,icon:'🎯',future:false},
+{h:'🧱 לגו משיקה ערכת מיינקראפט ענקית!',c:'lego',e:0.13,icon:'⛏️',future:false},
+{h:'🧩 פוקסמיינד נמכרת ב-50 מדינות!',c:'foxmind',e:0.18,icon:'🌍',future:false},
+{h:'🧸 טויס אר אס שולחת משלוחים חינם!',c:'toysrus',e:0.10,icon:'📦',future:false},
+{h:'🎁 עידן 2000 — שיתוף עם לגו!',c:'idan2000',e:0.17,icon:'🧱',future:false},
+{h:'🦊 פוקס — דוגמנים מפורסמים בקמפיין!',c:'fox',e:0.12,icon:'📸',future:false},
+{h:'👕 גולף זוכה בפרס אופנה ישראלי!',c:'golf',e:0.14,icon:'🏆',future:false},
+{h:'👟 נייקי — נעל חדשה שוברת שוק!',c:'nike',e:0.13,icon:'🔥',future:false},
+{h:'⚽ אדידס — מכירות שיא לפני מונדיאל!',c:'adidas',e:0.14,icon:'⚽',future:false},
+{h:'🍦 גולדה פותחת סניף בירושלים!',c:'golda',e:0.16,icon:'🏙️',future:false},
+{h:'🍔 מקדונלד׳ס ישראל — שנת מכירות שיא!',c:'mcdonalds',e:0.11,icon:'📈',future:false},
+{h:'🍕 ריבר — שף כוכב מצטרף!',c:'river',e:0.19,icon:'👨‍🍳',future:false},
+{h:'🏰 דיסני — פארק שעשועים מגיע לישראל?!',c:'disney',e:0.20,icon:'🎠',future:false},
+{h:'▶️ יוטיוב — 100 מיליון ישראלים צופים!',c:'youtube',e:0.12,icon:'🇮🇱',future:false},
+{h:'🎬 נטפליקס — סדרה ישראלית כובשת העולם!',c:'netflix',e:0.15,icon:'🌍',future:false},
+{h:'📱 סלקום — שיתוף פעולה עם אפל!',c:'cellcom',e:0.17,icon:'🍎',future:false},
+{h:'📚 סטימצקי — ספר ילדים ישראלי לרשימת בסטסלרים!',c:'steimatzki',e:0.13,icon:'📖',future:false},
+{h:'📖 צומת ספרים — אפליקציה חדשה שוקה!',c:'tzometsefarim',e:0.12,icon:'📲',future:false},
+{h:'🎨 ג׳אמבו — ילדי ישראל מכורים ליצירה!',c:'jumbo',e:0.15,icon:'✏️',future:false},
+{h:'🛍️ מקס סטוק — פריטים מיובאים יוקרתיים!',c:'maxstock',e:0.14,icon:'✨',future:false},
+{h:'🥛 תנובה — ייצוא לאירופה התחיל!',c:'tnuva',e:0.16,icon:'🚢',future:false},
+{h:'🍫 שטראוס — שיתוף עם קפה קפסולות!',c:'strauss',e:0.12,icon:'☕',future:false},
+{h:'🧃 טרה — מיץ ענבים ישראלי חדש!',c:'tera',e:0.11,icon:'🍇',future:false},
+{h:'🛒 אושר עד — שליחות מהירה ב-30 דקות!',c:'osheraad',e:0.15,icon:'⚡',future:false},
+{h:'🏷️ חצי חינם — עמדות self-checkout חדשות!',c:'hazihinam',e:0.11,icon:'🖥️',future:false},
+{h:'💊 סופר-פארם — אפליקציית בריאות חדשה!',c:'superpharm',e:0.13,icon:'📲',future:false},
+{h:'⛽ דלק — מינוי תדלוק בסבסוד!',c:'delek',e:0.12,icon:'💰',future:false},
+{h:'⚡ חברת החשמל — הפחתת חשבון ל-3 חודשים!',c:'electric',e:0.10,icon:'🎁',future:false},
+// ============================================================
+// שליליים - חברה ספציפית
+// ============================================================
+{h:'😱 תקלה חמורה בשרתי נינטנדו!',c:'nintendo',e:-0.13,icon:'🔴',future:false},
+{h:'🕹️ פלייסטיישן — דחיית השקה ב-6 חודשים!',c:'playstation',e:-0.12,icon:'😬',future:false},
+{h:'🧱 לגו מייקרת מחירים ב-20%!',c:'lego',e:-0.10,icon:'💸',future:false},
+{h:'🧩 פוקסמיינד מאבדת רישיון יוקרתי!',c:'foxmind',e:-0.15,icon:'📉',future:false},
+{h:'🧸 טויס אר אס סוגרת 5 סניפים',c:'toysrus',e:-0.12,icon:'🚪',future:false},
+{h:'🎁 עידן 2000 — מחסור חמור בסחורה',c:'idan2000',e:-0.11,icon:'📦',future:false},
+{h:'🦊 פוקס — ביקורת שלילית על איכות הבגדים',c:'fox',e:-0.10,icon:'👎',future:false},
+{h:'👕 גולף — שערוריית עבודת ילדים חושפת!',c:'golf',e:-0.18,icon:'😱',future:false},
+{h:'👟 נייקי — בעיית איכות בנעלי ריצה',c:'nike',e:-0.09,icon:'⚠️',future:false},
+{h:'⚽ אדידס — הדגם הנמכר ביותר אזל!',c:'adidas',e:-0.08,icon:'📭',future:false},
+{h:'❄️ קיץ קר — מכירות גלידה גולדה צנחו',c:'golda',e:-0.15,icon:'🥶',future:false},
+{h:'🍔 מקדונלד׳ס — שריפה בסניף מרכזי',c:'mcdonalds',e:-0.10,icon:'🔥',future:false},
+{h:'🍕 ריבר — פיטורי שף ראשי בשערורייה',c:'river',e:-0.14,icon:'👨‍🍳',future:false},
+{h:'🏰 דיסני — ביטול סדרה פופולרית',c:'disney',e:-0.11,icon:'😢',future:false},
+{h:'▶️ יוטיוב — מגבלות חדשות על תוכן',c:'youtube',e:-0.08,icon:'🚫',future:false},
+{h:'🎬 נטפליקס — ביטול עונה נוספת!',c:'netflix',e:-0.14,icon:'📉',future:false},
+{h:'📱 סלקום — עיצומי עובדים',c:'cellcom',e:-0.12,icon:'✊',future:false},
+{h:'📚 סטימצקי — ירידה במכירות ספרים',c:'steimatzki',e:-0.09,icon:'😔',future:false},
+{h:'📖 צומת ספרים — תחרות מאמזון מכה',c:'tzometsefarim',e:-0.13,icon:'📦',future:false},
+{h:'🎨 ג׳אמבו — בעיה בייצור, איחור משלוחים',c:'jumbo',e:-0.11,icon:'🏭',future:false},
+{h:'🛍️ מקס סטוק — תלונות על איכות מוצרים',c:'maxstock',e:-0.10,icon:'👎',future:false},
+{h:'🥛 תנובה — רכיב פגום בגבינה',c:'tnuva',e:-0.14,icon:'⚠️',future:false},
+{h:'🍫 שטראוס — מחסור בקקאו עולמי',c:'strauss',e:-0.09,icon:'☕',future:false},
+{h:'🧃 טרה — תוצאות כושלות ברבעון',c:'tera',e:-0.11,icon:'📉',future:false},
+{h:'🛒 אושר עד — ממצאי משרד הבריאות',c:'osheraad',e:-0.13,icon:'🏥',future:false},
+{h:'🏷️ חצי חינם — תחרות חריפה מרשתות',c:'hazihinam',e:-0.10,icon:'⚔️',future:false},
+{h:'💊 סופר-פארם — בעיה ברגולציה',c:'superpharm',e:-0.09,icon:'📋',future:false},
+{h:'⛽ דלק — עלייה חדה במחיר הנפט',c:'delek',e:-0.15,icon:'💸',future:false},
+{h:'⚡ חברת החשמל — קיצוצי חשמל אזוריים',c:'electric',e:-0.12,icon:'🌑',future:false},
+{h:'🎮 נינטנדו — פיצול מוצרים בלבל צרכנים',c:'nintendo',e:-0.10,icon:'😕',future:false},
+{h:'🕹️ פלייסטיישן — תלונות על אחסון קטן',c:'playstation',e:-0.09,icon:'💾',future:false},
+{h:'🧱 לגו — סט פגום בחנויות',c:'lego',e:-0.08,icon:'⚠️',future:false},
+{h:'🧸 טויס אר אס — מסחר אלקטרוני לוקח לקוחות',c:'toysrus',e:-0.11,icon:'🌐',future:false},
+{h:'🎁 עידן 2000 — ספק ראשי נסגר',c:'idan2000',e:-0.13,icon:'🏭',future:false},
+{h:'🦊 פוקס — מחיר הכותנה עלה',c:'fox',e:-0.09,icon:'📈',future:false},
+{h:'👕 גולף — מנכ"ל פורש פתאום',c:'golf',e:-0.12,icon:'👔',future:false},
+{h:'🍦 גולדה — לקוחות מתלוננים על טעם',c:'golda',e:-0.12,icon:'😞',future:false},
+{h:'🍔 מקדונלד׳ס — עלייה במחיר המנה',c:'mcdonalds',e:-0.08,icon:'💸',future:false},
+{h:'🍕 ריבר — ביקורות אוכל שליליות',c:'river',e:-0.11,icon:'⭐',future:false},
+{h:'🏰 דיסני — מחיר כניסה עולה',c:'disney',e:-0.07,icon:'💸',future:false},
+{h:'▶️ יוטיוב — פרסומות מוגזמות',c:'youtube',e:-0.07,icon:'📺',future:false},
+{h:'🎬 נטפליקס — מנויים מבטלים',c:'netflix',e:-0.12,icon:'🚪',future:false},
+{h:'📱 סלקום — נפילת רשת',c:'cellcom',e:-0.14,icon:'📵',future:false},
+{h:'📚 סטימצקי — סגירת סניפים',c:'steimatzki',e:-0.10,icon:'🚪',future:false},
+{h:'📖 צומת ספרים — ספר שנמשך',c:'tzometsefarim',e:-0.09,icon:'📕',future:false},
+{h:'⛽ דלק — קנס סביבתי',c:'delek',e:-0.13,icon:'🌿',future:false},
+{h:'⚡ חברת החשמל — תקלה גדולה',c:'electric',e:-0.10,icon:'⚠️',future:false},
+// ============================================================
+// חיוביים - מגזר ספציפי
+// ============================================================
+{h:'🎮 שוק הגיימינג שובר שיאים עולמיים!',c:null,sector:'גיימינג',e:0.12,icon:'🌍',future:false},
+{h:'🧸 עונת קניות צעצועים חזקה מהצפי!',c:null,sector:'צעצועים',e:0.10,icon:'🎁',future:false},
+{h:'👗 שבוע האופנה בתל-אביב — פריחה מלאה!',c:null,sector:'אופנה',e:0.09,icon:'✨',future:false},
+{h:'🍽️ פריחה בתחום המסעדות בישראל!',c:null,sector:'מסעדות',e:0.11,icon:'🌟',future:false},
+{h:'📺 פלטפורמות בידור — גידול עצום!',c:null,sector:'בידור',e:0.10,icon:'📈',future:false},
+{h:'📱 ענף התקשורת — שיא רווחים רבעוני!',c:null,sector:'תקשורת',e:0.09,icon:'💰',future:false},
+{h:'📚 קריאה חוזרת להיות מגמה פופולרית!',c:null,sector:'ספרים',e:0.11,icon:'📖',future:false},
+{h:'🎨 פעילויות פנאי בשיא הביקוש!',c:null,sector:'פנאי',e:0.10,icon:'🌈',future:false},
+{h:'🛒 הסופרמרקטים בישראל — שנת שיא!',c:null,sector:'סופרמרקט',e:0.08,icon:'🏆',future:false},
+{h:'🥛 ענף המזון הישראלי מתעצם!',c:null,sector:'מזון',e:0.09,icon:'💪',future:false},
+{h:'⚡ אנרגיה ירוקה — מגמה עולמית חזקה!',c:null,sector:'אנרגיה',e:0.11,icon:'🌱',future:false},
+{h:'🎮 ילדים מבלים יותר בבית — גיימינג מזנק!',c:null,sector:'גיימינג',e:0.09,icon:'🏠',future:false},
+{h:'🧩 חופשת קיץ — צעצועים נמכרים!',c:null,sector:'צעצועים',e:0.12,icon:'☀️',future:false},
+{h:'👟 מגמת ספורט — ביקוש לאופנת ספורט!',c:null,sector:'אופנה',e:0.08,icon:'🏃',future:false},
+{h:'🍕 ישראלים אוהבים לאכול בחוץ!',c:null,sector:'מסעדות',e:0.10,icon:'❤️',future:false},
+{h:"📺 בינג׳ ווצ׳ינג — תופעת בידור!",c:null,sector:"בידור",e:0.09,icon:"🛋️",future:false},
+{h:'📱 ישראלים בטלפון — שיא שימוש!',c:null,sector:'תקשורת',e:0.08,icon:'📊',future:false},
+{h:'📚 שנת פרסי ספרים — ישראל נוצצת!',c:null,sector:'ספרים',e:0.09,icon:'🏆',future:false},
+{h:'🎨 חופשות יוצרות — פנאי מגביר!',c:null,sector:'פנאי',e:0.11,icon:'🖌️',future:false},
+{h:'🛒 קניות אונליין בצמיחה!',c:null,sector:'סופרמרקט',e:0.10,icon:'💻',future:false},
+{h:'🥛 מהפכת הבריאות — מוצרי חלב בביקוש!',c:null,sector:'מזון',e:0.08,icon:'🥗',future:false},
+{h:'⚡ סבסוד ממשלתי לאנרגיה מתחדשת!',c:null,sector:'אנרגיה',e:0.13,icon:'🏛️',future:false},
+// ============================================================
+// שליליים - מגזר ספציפי
+// ============================================================
+{h:'🎮 משבר ב-gaming — שחקנים עוזבים לנייד!',c:null,sector:'גיימינג',e:-0.10,icon:'📉',future:false},
+{h:'🧸 ירידה בלידות — פחות ילדים, פחות צעצועים',c:null,sector:'צעצועים',e:-0.09,icon:'📉',future:false},
+{h:'👗 האופנה המהירה בחינם גונבת קהל',c:null,sector:'אופנה',e:-0.08,icon:'😬',future:false},
+{h:'🍽️ עלייה בעלויות שכירות — מסעדות מתקשות',c:null,sector:'מסעדות',e:-0.09,icon:'📋',future:false},
+{h:'📺 פיראטיות תוכן — מכה קשה לענף',c:null,sector:'בידור',e:-0.10,icon:'🏴‍☠️',future:false},
+{h:'📱 ירידה בשימוש בסלולר בקרב נוער',c:null,sector:'תקשורת',e:-0.08,icon:'📵',future:false},
+{h:'📚 ספרים אלקטרוניים גוזלים שוק',c:null,sector:'ספרים',e:-0.11,icon:'💻',future:false},
+{h:'🎨 ירידה בהוצאות פנאי',c:null,sector:'פנאי',e:-0.09,icon:'💸',future:false},
+{h:'🛒 אמזון מגיעה לישראל — מלחמת מחירים!',c:null,sector:'סופרמרקט',e:-0.12,icon:'📦',future:false},
+{h:'🥛 מחסור בחלב — ייצור בירידה',c:null,sector:'מזון',e:-0.10,icon:'⚠️',future:false},
+{h:'⚡ מס אנרגיה חדש — לחץ על הרווחים',c:null,sector:'אנרגיה',e:-0.11,icon:'📋',future:false},
+{h:'🎮 משחקים שנויים במחלוקת — ביקורת ציבורית',c:null,sector:'גיימינג',e:-0.09,icon:'😤',future:false},
+{h:'🧸 סכנת בטיחות — צעצועים נשלפים',c:null,sector:'צעצועים',e:-0.13,icon:'⚠️',future:false},
+{h:'👗 שריפות אוצר בגדים בחו"ל',c:null,sector:'אופנה',e:-0.10,icon:'🔥',future:false},
+{h:'🍕 שביתת שפים — מסעדות סגורות',c:null,sector:'מסעדות',e:-0.12,icon:'✊',future:false},
+{h:'📺 שיאי ביטולי מנויים',c:null,sector:'בידור',e:-0.09,icon:'🚪',future:false},
+{h:'📱 פריצת סייבר לרשתות סלולר',c:null,sector:'תקשורת',e:-0.14,icon:'💻',future:false},
+{h:'📚 נייר יקר — ספרים מתייקרים',c:null,sector:'ספרים',e:-0.08,icon:'📰',future:false},
+{h:'🎨 מתחמי פנאי נסגרים',c:null,sector:'פנאי',e:-0.11,icon:'🚪',future:false},
+{h:'🛒 שביתת עובדי שרשרת קירור',c:null,sector:'סופרמרקט',e:-0.09,icon:'🧊',future:false},
+{h:'🥛 רגולציה חדשה על צבעי מזון',c:null,sector:'מזון',e:-0.08,icon:'🔬',future:false},
+{h:'⚡ סערה חמה שורפת תשתיות',c:null,sector:'אנרגיה',e:-0.13,icon:'⛈️',future:false},
+// ============================================================
+// חיוביים - כלל המשק
+// ============================================================
+{h:'🌟 ישראל — שנת צמיחה כלכלית מרשימה!',c:null,sector:null,e:0.06,icon:'🇮🇱',future:false},
+{h:'💰 הריבית הבנקאית ירדה — הכסף זורם!',c:null,sector:null,e:0.07,icon:'🏦',future:false},
+{h:'🚀 שוק ההיטק פורח — השפעה חיובית!',c:null,sector:null,e:0.05,icon:'💻',future:false},
+{h:'🌍 הסכם סחר חדש — ישראל פותחת שווקים!',c:null,sector:null,e:0.06,icon:'🤝',future:false},
+{h:'☀️ תיירות שיא — ישראל פורחת!',c:null,sector:null,e:0.05,icon:'✈️',future:false},
+{h:'📊 אופטימיות צרכנית בשיא — כולם קונים!',c:null,sector:null,e:0.06,icon:'😊',future:false},
+{h:'🏗️ תשתיות חדשות — כלכלה מתעצמת',c:null,sector:null,e:0.05,icon:'🔨',future:false},
+{h:'💵 הדולר נחלש — מוצרי יבוא זולים!',c:null,sector:null,e:0.05,icon:'📉',future:false},
+{h:'🎓 נשירת ריבית — השקעות גדלות!',c:null,sector:null,e:0.07,icon:'📈',future:false},
+{h:'🏆 ישראל מצטיינת בחדשנות גלובלית!',c:null,sector:null,e:0.06,icon:'🥇',future:false},
+{h:'🌸 אביב — ישראלים יוצאים וקונים!',c:null,sector:null,e:0.04,icon:'🌺',future:false},
+{h:'🎉 חג לאומי — כולם בקניות!',c:null,sector:null,e:0.05,icon:'🛍️',future:false},
+{h:'📉 אינפלציה יורדת — כוח קנייה עולה!',c:null,sector:null,e:0.06,icon:'💪',future:false},
+{h:'🤝 הסכם שלום חדש — ביטחון מתחזק!',c:null,sector:null,e:0.07,icon:'🕊️',future:false},
+{h:'💡 ישראל — מרכז עולמי לחדשנות!',c:null,sector:null,e:0.05,icon:'💡',future:false},
+// ============================================================
+// שליליים - כלל המשק
+// ============================================================
+{h:'📉 מיתון כלכלי עולמי — כל השוק יורד!',c:null,sector:null,e:-0.10,icon:'🌪️',future:false},
+{h:'💸 אינפלציה גואה — כוח קנייה יורד',c:null,sector:null,e:-0.08,icon:'📈',future:false},
+{h:'⚔️ מתיחות גיאופוליטית — שווקים בפחד',c:null,sector:null,e:-0.09,icon:'🌐',future:false},
+{h:'🏦 מחנק אשראי — עסקים בלחץ',c:null,sector:null,e:-0.07,icon:'🔒',future:false},
+{h:'🌊 אסון טבע — פגיעה בשרשראות אספקה',c:null,sector:null,e:-0.08,icon:'🌧️',future:false},
+{h:'📉 דולר מתחזק — נזק ליצואנים',c:null,sector:null,e:-0.06,icon:'💵',future:false},
+{h:'🦠 גל מחלות — ירידה בפעילות כלכלית',c:null,sector:null,e:-0.09,icon:'😷',future:false},
+{h:'🛢️ נפט ב-200 דולר — משבר אנרגיה!',c:null,sector:null,e:-0.11,icon:'⛽',future:false},
+{h:'🔥 שריפות ענק — נזק תשתיות',c:null,sector:null,e:-0.07,icon:'🌡️',future:false},
+{h:'💻 מתקפת סייבר — נזק לכלכלה',c:null,sector:null,e:-0.08,icon:'👾',future:false},
+{h:'🚢 חסימת נמלים — עיכוב מטענים',c:null,sector:null,e:-0.06,icon:'⚓',future:false},
+{h:'📋 רגולציה כבדה — עסקים נדחקים',c:null,sector:null,e:-0.05,icon:'🏛️',future:false},
+{h:'🥶 חורף קשה — פגיעה בפעילות',c:null,sector:null,e:-0.06,icon:'❄️',future:false},
+{h:'💔 אמון ציבורי בשפל — כולם חוסכים',c:null,sector:null,e:-0.07,icon:'😟',future:false},
+{h:'🌋 זעזוע גיאופוליטי — שוק מתרסק',c:null,sector:null,e:-0.10,icon:'💥',future:false},
+// ============================================================
+// עתידיים - יתרחשו בעוד 1-5 סיבובים
+// ============================================================
+{h:'🔮 [עתיד] נינטנדו מתכננת קונסולה מהפכנית!',c:'nintendo',e:0.22,icon:'🚀',future:true},
+{h:'🔮 [עתיד] פלייסטיישן — הודעה גדולה!',c:'playstation',e:0.18,icon:'🎮',future:true},
+{h:'🔮 [עתיד] לגו מרחיבה לסדרת מבוגרים!',c:'lego',e:0.15,icon:'🧱',future:true},
+{h:'🔮 [עתיד] פוקסמיינד — הנפקה בבורסה!',c:'foxmind',e:0.25,icon:'📈',future:true},
+{h:'🔮 [עתיד] נטפליקס מתכננת עונה מצפה!',c:'netflix',e:0.18,icon:'🎬',future:true},
+{h:'🔮 [עתיד] נייקי עם שיתוף פעולה גדול!',c:'nike',e:0.14,icon:'👟',future:true},
+{h:'🔮 [עתיד] שטראוס מתכננת מיזוג גדול!',c:'strauss',e:0.16,icon:'🍫',future:true},
+{h:'🔮 [עתיד] דלק מתכננת מעבר לחשמל!',c:'delek',e:0.19,icon:'⚡',future:true},
+{h:'🔮 [עתיד] ג׳אמבו פותחת רשת בינלאומית!',c:'jumbo',e:0.22,icon:'🌍',future:true},
+{h:'🔮 [עתיד] ענף הגיימינג יתפוצץ!',c:null,sector:'גיימינג',e:0.18,icon:'🎮',future:true},
+{h:'🔮 [עתיד] חוק חדש ייפגע במסעדות!',c:null,sector:'מסעדות',e:-0.15,icon:'📋',future:true},
+{h:'🔮 [עתיד] גל חום קיץ — קפיצה בגלידה!',c:'golda',e:0.28,icon:'☀️',future:true},
+{h:'🔮 [עתיד] מגפה טכנולוגית — ירידה!',c:null,sector:null,e:-0.12,icon:'💻',future:true},
+{h:'🔮 [עתיד] תוכנית חיסכון ממשלתית!',c:null,sector:null,e:0.08,icon:'🏛️',future:true},
+{h:'🔮 [עתיד] אדידס — ספונסרות אולימפיאדה!',c:'adidas',e:0.17,icon:'🏅',future:true},
+{h:'🔮 [עתיד] חברת החשמל — השקעה ענקית!',c:'electric',e:0.20,icon:'⚡',future:true},
+{h:'🔮 [עתיד] מחסור עולמי בגז — דלק מזנק!',c:'delek',e:0.25,icon:'⛽',future:true},
+{h:'🔮 [עתיד] גולדה — ייצוא לאירופה!',c:'golda',e:0.22,icon:'🌍',future:true},
+{h:'🔮 [עתיד] ריבר — הרחבה לחיפה!',c:'river',e:0.18,icon:'🍕',future:true},
+{h:'🔮 [עתיד] סלקום — מיזוג עם חברה גדולה!',c:'cellcom',e:0.20,icon:'📱',future:true},
+{h:'🔮 [עתיד] מקדונלד׳ס — תפריט חדש!',c:'mcdonalds',e:0.12,icon:'🍔',future:true},
+{h:'🔮 [עתיד] לגו — שיתוף עם מיינקראפט!',c:'lego',e:0.19,icon:'⛏️',future:true},
+{h:'🔮 [עתיד] דיסני — פארק בדובאי!',c:'disney',e:0.16,icon:'🏰',future:true},
+{h:'🔮 [עתיד] יוטיוב — שינוי מדיניות פרמיום!',c:'youtube',e:-0.10,icon:'⚠️',future:true},
+{h:'🔮 [עתיד] טויס אר אס — סגירת רשת!',c:'toysrus',e:-0.20,icon:'🚪',future:true},
+{h:'🔮 [עתיד] עידן 2000 — ייבוא מסין!',c:'idan2000',e:0.14,icon:'🐉',future:true},
+{h:'🔮 [עתיד] נינטנדו — הפסקת מוצר פופולרי!',c:'nintendo',e:-0.12,icon:'😢',future:true},
+{h:'🔮 [עתיד] ענף האנרגיה — מהפכה ירוקה!',c:null,sector:'אנרגיה',e:0.15,icon:'🌿',future:true},
+{h:'🔮 [עתיד] סופרמרקטים — מחיר מינימום!',c:null,sector:'סופרמרקט',e:-0.09,icon:'📋',future:true},
+{h:'🔮 [עתיד] תנובה — מיזוג ענק!',c:'tnuva',e:0.18,icon:'🥛',future:true},
+{h:'🔮 [עתיד] פוקס — רשת בינלאומית!',c:'fox',e:0.16,icon:'🌍',future:true},
+{h:'🔮 [עתיד] סטימצקי — הנפקה!',c:'steimatzki',e:0.20,icon:'📚',future:true},
+{h:'🔮 [עתיד] צמיחה כלכלית — שוק מזנק!',c:null,sector:null,e:0.10,icon:'🚀',future:true},
+{h:'🔮 [עתיד] מיתון עולמי — שוק קורס!',c:null,sector:null,e:-0.15,icon:'💥',future:true},
+{h:'🔮 [עתיד] סלקום — בעיית בטיחות!',c:'cellcom',e:-0.18,icon:'⚠️',future:true},
+{h:'🔮 [עתיד] גולף — כניסה לשוק גלובלי!',c:'golf',e:0.21,icon:'🌍',future:true},
+{h:'🔮 [עתיד] נטפליקס — ירידת מנויים!',c:'netflix',e:-0.15,icon:'📉',future:true},
+{h:'🔮 [עתיד] מקס סטוק — הנפקה!',c:'maxstock',e:0.22,icon:'📈',future:true},
+{h:'🔮 [עתיד] ביקוש לספרים — גל חדש!',c:null,sector:'ספרים',e:0.14,icon:'📚',future:true},
+{h:'🔮 [עתיד] אדידס — בעיית ספק!',c:'adidas',e:-0.11,icon:'⚠️',future:true},
+{h:'🔮 [עתיד] חברת החשמל — הפרטה!',c:'electric',e:0.18,icon:'🔑',future:true},
+{h:'🔮 [עתיד] שטראוס — מוצר חדש פורץ!',c:'strauss',e:0.14,icon:'🍫',future:true},
+{h:'🔮 [עתיד] שוק בידור — מחלוקת!',c:null,sector:'בידור',e:-0.10,icon:'⚔️',future:true},
+{h:'🔮 [עתיד] ג׳אמבו — שיתוף עם לגו!',c:'jumbo',e:0.19,icon:'🧱',future:true},
+{h:'🔮 [עתיד] ריבר — שרשרת בינלאומית!',c:'river',e:0.20,icon:'🌍',future:true},
+{h:'🔮 [עתיד] אושר עד — מיזוג!',c:'osheraad',e:0.17,icon:'🛒',future:true},
+{h:'🔮 [עתיד] חצי חינם — שינוי מודל!',c:'hazihinam',e:-0.09,icon:'🔄',future:true},
+{h:'🔮 [עתיד] דיסני — שידוכים עם חברה ישראלית!',c:'disney',e:0.14,icon:'🇮🇱',future:true},
+{h:'🔮 [עתיד] ניקי — תביעה משפטית!',c:'nike',e:-0.13,icon:'⚖️',future:true},
+{h:'🔮 [עתיד] טרה — ייצוא לארה"ב!',c:'tera',e:0.18,icon:'🌎',future:true},
+];
+
+const QUESTS = [
+  {desc:'קנה לפחות מניה אחת ממגזר המזון',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='מזון'),reward:500},
+  {desc:'הגע לשווי תיק כולל של ₪12,000',check:(p,gs)=>totalValue(p,gs)>=12000,reward:800},
+  {desc:'קנה מניות מ-3 מגזרים שונים',check:(p,gs)=>{const cats=new Set(p.portfolio.map(h=>COMPANIES.find(c=>c.id===h.id)?.category));return cats.size>=3;},reward:700},
+  {desc:'שמור ₪2,000 בחשבון חיסכון',check:(p)=>p.savings>=2000,reward:400},
+  {desc:'קנה מניית צעצועים אחת',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='צעצועים'),reward:450},
+  {desc:'החזק לפחות 5 מניות שונות',check:(p)=>p.portfolio.length>=5,reward:600},
+  {desc:'קנה מניה מסיכון "יציב"',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.risk==='stable'),reward:350},
+  {desc:'הגע לשווי תיק כולל של ₪15,000',check:(p,gs)=>totalValue(p,gs)>=15000,reward:1200},
+  {desc:'אל תמכור אף מניה בסיבוב זה',check:(p)=>!p.soldThisRound,reward:300},
+  {desc:'קנה מניות מ-4 מגזרים שונים',check:(p,gs)=>{const cats=new Set(p.portfolio.map(h=>COMPANIES.find(c=>c.id===h.id)?.category));return cats.size>=4;},reward:900},
+  {desc:'החזק מניות גיימינג',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='גיימינג'),reward:400},
+  {desc:'קנה מניה מסקטור הספרים',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='ספרים'),reward:380},
+  {desc:'קנה מניה מסקטור האנרגיה',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='אנרגיה'),reward:420},
+  {desc:'קנה מניה מסקטור הפנאי',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='פנאי'),reward:360},
+  {desc:'קנה מניה מסקטור הסופרמרקט',check:(p,gs)=>p.portfolio.some(h=>COMPANIES.find(c=>c.id===h.id)?.category==='סופרמרקט'),reward:350},
+  {desc:'הגע לשווי תיק כולל של ₪20,000',check:(p,gs)=>totalValue(p,gs)>=20000,reward:1500},
+  {desc:'החזק מניות מ-5 מגזרים שונים',check:(p,gs)=>{const cats=new Set(p.portfolio.map(h=>COMPANIES.find(c=>c.id===h.id)?.category));return cats.size>=5;},reward:1000},
+  {desc:'קנה מניות בסך 3,000 ש"ח בסיבוב אחד',check:(p,gs)=>{const bought=(G.roundActions[p.id]||[]).filter(a=>a.type==='buy').reduce((s,a)=>s+a.total,0);return bought>=3000;},reward:650},
+];
+
+const AVATARS = ['😎','🦸','🧠','🦊','🐯','🦁','🐧','🦅','🐬','🎩','👑','🤖'];
+
+// ============================================================
+// GAME STATE
+// ============================================================
+let G = {
+  players:[],round:1,totalRounds:10,startCash:10000,
+  stocks:{},priceHistory:{},stockPrevPrices:{},
+  currentPlayer:0,donePlayers:[],
+  roundNews:[],futureNews:[], // futureNews: [{news, triggerRound}]
+  roundActions:{},phase:'playing',
+  lastRoundPrices:{}, // prices at start of round for % calc
+};
+
+function totalValue(player,gs){
+  let v=player.cash;
+  player.portfolio.forEach(h=>{v+=h.qty*(gs.stocks[h.id]||0);});
+  v+=player.savings;
+  v-=player.loanAmount;
+  return v;
+}
+
+// ============================================================
+// SETUP
+// ============================================================
+let playerCount=0;
+function addPlayer(){
+  const avatar=AVATARS[playerCount%AVATARS.length];
+  playerCount++;
+  const num=playerCount;
+  const id='p'+num;
+  const div=document.createElement('div');
+  div.className='player-row';
+  div.id='player-row-'+id;
+  const span=document.createElement('span');
+  span.style.fontSize='1.5rem';
+  span.textContent=avatar;
+  const inp=document.createElement('input');
+  inp.type='text';
+  inp.placeholder='שם שחקן '+num;
+  inp.value='שחקן '+num;
+  inp.style.cssText='flex:1;background:transparent;border:none;color:var(--text);font-family:Heebo,sans-serif;font-size:1rem;text-align:right;';
+  const btn=document.createElement('button');
+  btn.className='btn btn-icon';
+  btn.textContent='✕';
+  btn.onclick=()=>removePlayer(id);
+  div.appendChild(span);
+  div.appendChild(inp);
+  div.appendChild(btn);
+  document.getElementById('players-list').appendChild(div);
+}
+
+function removePlayer(id){const el=document.getElementById('player-row-'+id);if(el)el.remove();}
+
+function startGame(){
+  const rows=document.querySelectorAll('.player-row');
+  if(rows.length<1){showToast('הוסף לפחות שחקן אחד!','red');return;}
+  const cash=parseInt(document.getElementById('start-cash').value)||10000;
+  const rounds=parseInt(document.getElementById('num-rounds').value)||10;
+  const players=[];
+  rows.forEach((row,i)=>{
+    const inp=row.querySelector('input[type="text"]');
+    const name=inp?inp.value.trim()||('שחקן '+(i+1)):'שחקן '+(i+1);
+    const av=row.querySelector('span');
+    const avatar=av?av.textContent:AVATARS[i%AVATARS.length];
+    players.push({id:'p'+(i+1),name,avatar,cash,portfolio:[],savings:0,savingsRoundsLeft:0,loanAmount:0,hasInsurance:false,hasNewsSub:false,newsSubMonthly:false,soldThisRound:false,quest:null,questDone:false,totalValueHistory:[cash]});
+  });
+  G.players=players;G.round=1;G.totalRounds=rounds;G.startCash=cash;
+  G.currentPlayer=0;G.donePlayers=[];G.roundActions={};G.futureNews=[];
+  players.forEach(p=>{G.roundActions[p.id]=[];});
+  COMPANIES.forEach(c=>{G.stocks[c.id]=c.basePrice;G.priceHistory[c.id]=[c.basePrice];G.lastRoundPrices[c.id]=c.basePrice;});
+  assignQuests();G.phase='playing';
+  saveGame();showGameScreen();
+}
+
+function assignQuests(){
+  const shuffled=[...QUESTS].sort(()=>Math.random()-.5);
+  G.players.forEach((p,i)=>{p.quest=shuffled[i%shuffled.length];p.questDone=false;});
+}
+
+// SAVE / LOAD
+function saveGame(){try{localStorage.setItem('borsa_save',JSON.stringify(G));}catch(e){}}
+function loadGame(){
+  const raw=localStorage.getItem('borsa_save');if(!raw)return;
+  G=JSON.parse(raw);
+  G.players.forEach(p=>{if(p.quest){const m=QUESTS.find(q=>q.desc===p.quest.desc);if(m)p.quest=m;}});
+  if(G.phase==='playing')showGameScreen();
+  else if(G.phase==='summary')showSummaryScreen();
+  else showEndScreen();
+}
+function resetSave(){if(!confirm('בטוח?'))return;localStorage.removeItem('borsa_save');location.reload();}
+
+// SCREENS
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function showGameScreen(){showScreen('game-screen');document.getElementById('current-day-label').textContent=G.round;renderPlayerTabs();renderSidebar();renderStocks();updateNewsTicker();}
+function showSummaryScreen(){G.phase='summary';showScreen('summary-screen');renderSummary();}
+function showEndScreen(){G.phase='end';showScreen('end-screen');renderEnd();}
+function goToSetup(){localStorage.removeItem('borsa_save');location.reload();}
+
+// ============================================================
+// GAME SCREEN
+// ============================================================
+function updateHeaderCash(){
+  const p=G.players[G.currentPlayer];if(!p)return;
+  const av=document.getElementById('header-player-avatar');
+  const nm=document.getElementById('header-player-name');
+  const cv=document.getElementById('header-cash-value');
+  if(av)av.textContent=p.avatar;
+  if(nm)nm.textContent=p.name;
+  if(cv)cv.textContent='₪'+fmt(p.cash);
+}
+
+function renderPlayerTabs(){
+  const container=document.getElementById('player-tabs');container.innerHTML='';
+  G.players.forEach((p,i)=>{
+    const done=G.donePlayers.includes(p.id);
+    const tv=totalValue(p,G);
+    const div=document.createElement('div');
+    div.className='player-tab'+(i===G.currentPlayer?' active':'')+(done?' done-tab':'');
+    div.onclick=()=>{if(!done){G.currentPlayer=i;renderSidebar();renderStocks();renderPlayerTabs();}};
+    div.innerHTML=`${p.avatar} ${p.name} <span class="tab-value">₪${fmt(tv)}</span>${done?'<span class="tab-done">✓</span>':''}`;
+    container.appendChild(div);
+  });
+}
+
+function renderSidebar(){
+  updateHeaderCash();
+  const p=G.players[G.currentPlayer];if(!p)return;
+  const tv=totalValue(p,G);
+  const pct=(((tv-G.startCash)/G.startCash)*100).toFixed(1);
+  const pClass=pct>=0?'green':'red';
+  document.getElementById('player-profile').innerHTML=`
+    <div class="player-avatar-big">${p.avatar}</div>
+    <div class="player-name-big">${p.name}</div>
+    <div class="player-cash">₪${fmt(p.cash)}</div>
+    <div class="player-cash-label">מזומן זמין</div>
+    <div class="stat-row mt-16"><span class="stat-label">שווי כולל</span><span class="stat-val yellow">₪${fmt(tv)}</span></div>
+    <div class="stat-row"><span class="stat-label">רווח/הפסד</span><span class="stat-val ${pClass}">${pct>=0?'+':''}${pct}%</span></div>
+    ${p.loanAmount>0?`<div class="stat-row"><span class="stat-label">הלוואה</span><span class="stat-val red">-₪${fmt(p.loanAmount)}</span></div>`:''}
+    ${p.hasInsurance?`<div class="stat-row"><span class="stat-label">ביטוח</span><span class="stat-val green">✓</span></div>`:''}
+    ${p.hasNewsSub||p.newsSubMonthly?`<div class="stat-row"><span class="stat-label">מינוי חדשות</span><span class="stat-val green">✓ פעיל</span></div>`:''}
+  `;
+  // Portfolio
+  let portHTML=`<div style="margin-top:14px"><div class="section-title">💼 תיק מניות</div>`;
+  if(!p.portfolio.length){portHTML+=`<div class="text-muted" style="margin-top:7px">אין מניות עדיין</div>`;}
+  else{
+    portHTML+=`<div class="portfolio-list">`;
+    p.portfolio.forEach(h=>{
+      const co=COMPANIES.find(c=>c.id===h.id);const cur=G.stocks[h.id];
+      const val=h.qty*cur;const pnl=val-h.qty*h.avgCost;const pc=pnl>=0?'green':'red';
+      portHTML+=`<div class="port-item">
+        <div class="port-item-top"><span>${co.emoji} ${co.name} ×${h.qty}</span><span class="mono">₪${fmt(val)}</span></div>
+        <div class="port-item-bot"><span>₪${fmt(cur)}/מניה</span><span class="mono ${pc}">${pnl>=0?'+':''}₪${fmt(pnl)}</span></div>
+      </div>`;
+    });
+    portHTML+=`</div>`;
+  }
+  portHTML+=`</div>`;
+  if(p.savings>0){portHTML+=`<div class="savings-card"><div class="savings-label">🏦 חיסכון</div><div class="savings-amount">₪${fmt(p.savings)}</div><div class="savings-info">${p.savingsRoundsLeft>0?`נפתח בעוד ${p.savingsRoundsLeft} סיבובים • +3%/סיבוב`:'✅ זמין למשיכה'}</div></div>`;}
+  document.getElementById('portfolio-section').innerHTML=portHTML;
+  // Diversification
+  const cats=new Set(p.portfolio.map(h=>COMPANIES.find(c=>c.id===h.id)?.category).filter(Boolean));
+  const score=Math.min(cats.size,5);const pctD=(score/5)*100;
+  const col=score<=1?'var(--red)':score<=2?'var(--orange)':score<=3?'var(--yellow)':'var(--green)';
+  const divLabel=['—','💀 כל הביצים בסל אחד!','⚠️ גיוון נמוך','🌤️ מתחיל','👍 טוב','🌟 מגוון מצוין!'][score];
+  document.getElementById('sidebar-features').innerHTML=`<div class="div-meter-wrap"><div class="section-title">📊 גיוון תיק</div><div class="div-meter-bar"><div class="div-meter-fill" style="width:${pctD}%;background:${col}"></div></div><div style="font-size:0.77rem;color:var(--text2);display:flex;justify-content:space-between"><span>${divLabel}</span><span class="mono">${score}/5</span></div></div>`;
+  // Quest
+  if(p.quest)document.getElementById('quest-section').innerHTML=`<div class="quest-card"><div class="quest-title">🎯 משימה יומית</div><div class="quest-desc">${p.quest.desc}${p.questDone?' ✅':''}</div><div class="quest-reward">🎁 פרס: ₪${fmt(p.quest.reward)}</div></div>`;
+  // Actions
+  document.getElementById('sidebar-actions').innerHTML=`
+    <div class="section-title" style="margin-bottom:7px">⚡ פעולות מיוחדות</div>
+    <button class="btn btn-secondary btn-sm" onclick="openBankModal()" style="justify-content:flex-start">🏦 חשבון חיסכון</button>
+    <button class="btn btn-secondary btn-sm" onclick="openLoanModal()" style="justify-content:flex-start">💳 הלוואה</button>
+    <button class="btn btn-secondary btn-sm" onclick="openInsuranceModal()" style="justify-content:flex-start">🛡️ ביטוח שוק</button>
+    <button class="btn btn-secondary btn-sm" onclick="openNewsSubModal()" style="justify-content:flex-start">📰 חדשות מוקדמות</button>
+    <button class="btn btn-primary btn-sm" onclick="endTurn()" style="margin-top:7px">✅ סיים תור →</button>
+  `;
+}
+
+// ============================================================
+// STOCK GRID
+// ============================================================
+let activeFilter='הכל';
+function renderStocks(){
+  const p=G.players[G.currentPlayer];
+  // Pills
+  const pillsEl=document.getElementById('filter-pills');
+  pillsEl.innerHTML='';
+  CATEGORIES.forEach(cat=>{
+    const span=document.createElement('span');
+    span.className='pill'+(cat===activeFilter?' active':'');
+    span.textContent=cat;
+    span.onclick=()=>{activeFilter=cat;renderStocks();};
+    pillsEl.appendChild(span);
+  });
+  const search=(document.getElementById('search-input').value||'').toLowerCase();
+  const grid=document.getElementById('stocks-grid');grid.innerHTML='';
+  let visible=COMPANIES;
+  if(activeFilter!=='הכל')visible=visible.filter(c=>c.category===activeFilter);
+  if(search)visible=visible.filter(c=>c.name.toLowerCase().includes(search)||c.category.includes(search));
+  visible.forEach(company=>{
+    const price=G.stocks[company.id];
+    const hist=G.priceHistory[company.id]||[price];
+    const prev=hist.length>=2?hist[hist.length-2]:price;
+    const change=price-prev;const changePct=prev>0?((change/prev)*100).toFixed(1):'0.0';
+    const holding=p.portfolio.find(h=>h.id===company.id);
+    const card=document.createElement('div');
+    card.className='stock-card'+(holding?' owned':'');
+    card.id='card-'+company.id;
+    const riskLabel={stable:'יציב',volatile:'תנודתי','very-volatile':'מסוכן'}[company.risk];
+    const changeClass=change>0?'change-up':change<0?'change-down':'change-neutral';
+    const changeSign=change>0?'+':'';
+    const logoHTML=`<div class="stock-logo-wrap"><img src="${company.logo}" alt="${company.name}" onerror="this.parentElement.innerHTML='<div class=\\'stock-emoji-fallback\\'>${company.emoji}</div>'"></div>`;
+    card.innerHTML=`
+      <div class="stock-header">
+        <div style="display:flex;gap:9px;align-items:flex-start">
+          ${logoHTML}
+          <div><div class="stock-name">${company.name}</div><div class="stock-category"><span class="tag tag-cat">${company.category}</span></div></div>
+        </div>
+        <span class="stock-risk risk-${company.risk}">${riskLabel}</span>
+      </div>
+      <div class="stock-price-row">
+        <div class="stock-price">₪${fmt(price)}</div>
+        <div class="stock-change ${changeClass}">${changeSign}${changePct}%</div>
+      </div>
+      <div class="mini-chart"><canvas id="chart-${company.id}" height="38"></canvas></div>
+      ${holding?`<div class="stock-owned-badge">✓ ברשותך: ${holding.qty} מניות</div>`:''}
+      <div class="stock-actions">
+        <button class="buy-btn" onclick="openBuyModal('${company.id}')">קנה ▲</button>
+        <button class="sell-btn" ${!holding?'disabled':''} onclick="openSellModal('${company.id}')">מכור ▼</button>
+      </div>`;
+    grid.appendChild(card);
+    setTimeout(()=>drawMiniChart(company.id),0);
+  });
+}
+
+function drawMiniChart(id){
+  const canvas=document.getElementById('chart-'+id);if(!canvas)return;
+  const hist=G.priceHistory[id]||[];if(hist.length<2)return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth||240;canvas.height=38;
+  const min=Math.min(...hist),max=Math.max(...hist),range=max-min||1;
+  const w=canvas.width,h=canvas.height;
+  const last=hist[hist.length-1],first=hist[0];
+  const color=last>=first?'#00ff88':'#ff3366';
+  ctx.clearRect(0,0,w,h);
+  ctx.beginPath();
+  hist.forEach((p,i)=>{
+    const x=(i/(hist.length-1))*w;
+    const y=h-((p-min)/range)*(h-4)-2;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();
+  ctx.fillStyle=color+'22';ctx.fill();
+}
+
+function filterStocks(){renderStocks();}
+
+// ============================================================
+// NEWS TICKER
+// ============================================================
+function updateNewsTicker(){
+  const ticker=document.getElementById('news-ticker');
+  if(G.round===1||G.roundNews.length===0){
+    ticker.innerHTML=`<span class="news-item">📢 ברוכים הבאים לבורסת הילדים! קנו, מכרו, והתעשרו! 💰</span><span class="news-item">📢 ברוכים הבאים לבורסת הילדים! קנו, מכרו, והתעשרו! 💰</span>`;
+    return;
+  }
+  const items=[...G.roundNews,...G.roundNews];
+  ticker.innerHTML=items.map(n=>`<span class="news-item">${n.icon} <strong>${n.h}</strong> <span class="${n.e>0?'up':n.e<0?'down':''}">${n.e!==0?(n.e>0?'▲':'▼')+Math.abs((n.e*100).toFixed(0))+'%':''}</span></span>`).join('');
+}
+
+// ============================================================
+// BUY / SELL
+// ============================================================
+function openBuyModal(companyId){
+  const company=COMPANIES.find(c=>c.id===companyId);
+  const p=G.players[G.currentPlayer];
+  const price=G.stocks[companyId];
+  window._buyQty=1;window._buyId=companyId;
+  function render(){
+    const qty=window._buyQty,total=qty*price,canAfford=p.cash>=total;
+    const logoHTML=`<img src="${company.logo}" style="width:32px;height:32px;object-fit:contain;background:white;border-radius:6px;padding:2px" onerror="this.style.display='none'">`;
+    document.getElementById('modal-content').innerHTML=`
+      <h2>${logoHTML} קנה — ${company.name}</h2>
+      <div class="modal-info">
+        <div class="row"><span>מחיר למניה</span><span class="mono">₪${fmt(price)}</span></div>
+        <div class="row"><span>מזומן זמין</span><span class="mono">₪${fmt(p.cash)}</span></div>
+        <div class="row"><span>סיכון</span><span class="stock-risk risk-${company.risk}">${{stable:'יציב',volatile:'תנודתי','very-volatile':'מסוכן'}[company.risk]}</span></div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="window._buyQty=Math.max(1,window._buyQty-1);openBuyModal('${companyId}')">−</button>
+        <div class="qty-display">${qty}</div>
+        <button class="qty-btn" onclick="window._buyQty++;openBuyModal('${companyId}')">+</button>
+      </div>
+      <div class="total-cost" style="color:${canAfford?'var(--green)':'var(--red)'}">
+        ${canAfford?'✓':'✗'} סה"כ: ₪${fmt(total)}
+      </div>
+      <div style="display:flex;gap:9px">
+        <button class="btn btn-success full-w" onclick="buyStock('${companyId}',${qty})" ${!canAfford?'disabled':''}>🛒 קנה ${qty} מניות</button>
+        <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+      </div>`;
+  }
+  render();openModal();
+}
+
+function openSellModal(companyId){
+  const company=COMPANIES.find(c=>c.id===companyId);
+  const p=G.players[G.currentPlayer];
+  const price=G.stocks[companyId];
+  const holding=p.portfolio.find(h=>h.id===companyId);if(!holding)return;
+  window._sellQty=1;window._sellId=companyId;
+  function render(){
+    const qty=window._sellQty,total=qty*price,cost=qty*holding.avgCost,profit=total-cost;
+    const tax=profit>0?Math.round(profit*0.1):0,net=total-tax;
+    const logoHTML=`<img src="${company.logo}" style="width:32px;height:32px;object-fit:contain;background:white;border-radius:6px;padding:2px" onerror="this.style.display='none'">`;
+    document.getElementById('modal-content').innerHTML=`
+      <h2>${logoHTML} מכור — ${company.name}</h2>
+      <div class="modal-info">
+        <div class="row"><span>מחיר נוכחי</span><span class="mono">₪${fmt(price)}</span></div>
+        <div class="row"><span>ממוצע קנייה</span><span class="mono">₪${fmt(Math.round(holding.avgCost))}</span></div>
+        <div class="row"><span>ברשותך</span><span class="mono">${holding.qty} מניות</span></div>
+      </div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="window._sellQty=Math.max(1,window._sellQty-1);openSellModal('${companyId}')">−</button>
+        <div class="qty-display">${qty}</div>
+        <button class="qty-btn" onclick="window._sellQty=Math.min(${holding.qty},window._sellQty+1);openSellModal('${companyId}')">+</button>
+      </div>
+      <div class="modal-info">
+        <div class="row"><span>הכנסה ברוטו</span><span class="mono">₪${fmt(total)}</span></div>
+        <div class="row"><span>רווח/הפסד</span><span class="mono" style="color:${profit>=0?'var(--green)':'var(--red)'}">${profit>=0?'+':''}₪${fmt(profit)}</span></div>
+        ${tax>0?`<div class="row"><span>מס רווח הון 10%</span><span class="mono" style="color:var(--red)">-₪${fmt(tax)}</span></div>`:''}
+        <div class="row"><span><b>נטו לכיס</b></span><span class="mono" style="color:var(--green)"><b>₪${fmt(net)}</b></span></div>
+      </div>
+      ${tax>0?`<div class="tax-notice">💡 מסים עוזרים לבנות בתי-ספר, גנים ציבוריים ובתי-חולים לכולנו!</div>`:''}
+      <div style="display:flex;gap:9px">
+        <button class="btn btn-danger full-w" onclick="sellStock('${companyId}',${qty})">💸 מכור ${qty}</button>
+        <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+      </div>`;
+  }
+  render();openModal();
+}
+
+function buyStock(companyId,qty){
+  const p=G.players[G.currentPlayer];
+  const price=G.stocks[companyId];const total=qty*price;
+  if(p.cash<total){showToast('אין מספיק מזומן!','red');return;}
+  p.cash-=total;
+  const ex=p.portfolio.find(h=>h.id===companyId);
+  if(ex){ex.avgCost=((ex.avgCost*ex.qty)+(price*qty))/(ex.qty+qty);ex.qty+=qty;}
+  else{p.portfolio.push({id:companyId,qty,avgCost:price});}
+  const co=COMPANIES.find(c=>c.id===companyId);
+  G.roundActions[p.id].push({type:'buy',company:co.name,qty,price,total});
+  checkQuest(p);
+  const card=document.getElementById('card-'+companyId);
+  if(card){card.classList.add('flash-green');setTimeout(()=>card.classList.remove('flash-green'),600);}
+  showToast(`✅ קנית ${qty} מניות של ${co.name}!`,'green');
+  closeModal();saveGame();renderSidebar();renderStocks();
+}
+
+function sellStock(companyId,qty){
+  const p=G.players[G.currentPlayer];
+  const price=G.stocks[companyId];
+  const holding=p.portfolio.find(h=>h.id===companyId);if(!holding||holding.qty<qty){showToast('אין מספיק מניות!','red');return;}
+  const total=qty*price,cost=qty*holding.avgCost,profit=total-cost;
+  const tax=profit>0?Math.round(profit*0.1):0,net=total-tax;
+  p.cash+=net;holding.qty-=qty;
+  if(holding.qty===0)p.portfolio=p.portfolio.filter(h=>h.id!==companyId);
+  p.soldThisRound=true;
+  const co=COMPANIES.find(c=>c.id===companyId);
+  G.roundActions[p.id].push({type:'sell',company:co.name,qty,price,total,profit,tax});
+  const card=document.getElementById('card-'+companyId);
+  if(card){card.classList.add('flash-red');setTimeout(()=>card.classList.remove('flash-red'),600);}
+  showToast(profit>0?`✅ מכרת ברווח ₪${fmt(profit)}! (מס: ₪${fmt(tax)})`:`📉 מכרת בהפסד ₪${fmt(Math.abs(profit))}`,profit>=0?'green':'red');
+  closeModal();saveGame();renderSidebar();renderStocks();
+}
+
+function checkQuest(p){
+  if(!p.quest||p.questDone)return;
+  if(p.quest.check(p,G)){
+    p.questDone=true;p.cash+=p.quest.reward;
+    showToast(`🎯 משימה הושלמה! +₪${fmt(p.quest.reward)}`,'yellow');
+    G.roundActions[p.id].push({type:'quest',desc:p.quest.desc,reward:p.quest.reward});
+  }
+}
+
+// ============================================================
+// SPECIAL FEATURES
+// ============================================================
+function openBankModal(){
+  const p=G.players[G.currentPlayer];
+  document.getElementById('modal-content').innerHTML=`
+    <h2>🏦 חשבון חיסכון</h2>
+    <div class="modal-info">
+      <div class="row"><span>מזומן זמין</span><span class="mono">₪${fmt(p.cash)}</span></div>
+      <div class="row"><span>חיסכון קיים</span><span class="mono ${p.savings>0?'green':''}">₪${fmt(p.savings)}</span></div>
+      ${p.savings>0?`<div class="row"><span>סיבובים לפתיחה</span><span class="mono yellow">${p.savingsRoundsLeft}</span></div>`:''}
+    </div>
+    <div class="tax-notice" style="border-color:rgba(0,229,255,.3);color:var(--accent);background:rgba(0,229,255,.1)">
+      💡 ריבית 3% בכל סיבוב. הכסף ננעל ל-5 סיבובים!
+    </div>
+    ${p.savings>0&&p.savingsRoundsLeft===0?`<button class="btn btn-primary full-w mb-16" onclick="withdrawSavings()">📤 משוך (₪${fmt(p.savings)})</button>`:''}
+    ${p.savings===0||p.savingsRoundsLeft===0?`
+    <div class="input-group"><label>סכום להפקדה (₪)</label><input type="number" id="deposit-amt" value="${Math.min(1000,p.cash)}" min="100" max="${p.cash}" step="100"></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn btn-success full-w" onclick="depositSavings()">🏦 הפקד</button>
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+    </div>`:`<button class="btn btn-secondary full-w" onclick="closeModal()">סגור</button>`}
+  `;openModal();
+}
+function depositSavings(){
+  const p=G.players[G.currentPlayer];
+  const amt=parseInt(document.getElementById('deposit-amt').value)||0;
+  if(amt<=0||amt>p.cash){showToast('סכום לא תקין!','red');return;}
+  p.cash-=amt;p.savings+=amt;p.savingsRoundsLeft=5;
+  G.roundActions[p.id].push({type:'deposit',amount:amt});
+  showToast(`🏦 הפקדת ₪${fmt(amt)} לחיסכון!`,'green');
+  saveGame();renderSidebar();closeModal();
+}
+function withdrawSavings(){
+  const p=G.players[G.currentPlayer];
+  if(p.savingsRoundsLeft>0){showToast('החיסכון עדיין נעול!','red');return;}
+  const w=p.savings;
+  G.roundActions[p.id].push({type:'withdraw',amount:w});
+  p.cash+=w;p.savings=0;p.savingsRoundsLeft=0;
+  showToast(`💰 משכת ₪${fmt(w)} מהחיסכון!`,'green');
+  saveGame();renderSidebar();closeModal();
+}
+
+function openLoanModal(){
+  const p=G.players[G.currentPlayer];
+  const tv=totalValue(p,G);const maxLoan=Math.round(tv*0.2);const canBorrow=Math.max(0,maxLoan-p.loanAmount);
+  document.getElementById('modal-content').innerHTML=`
+    <h2>💳 הלוואה</h2>
+    <div class="modal-info">
+      <div class="row"><span>שווי תיק</span><span class="mono">₪${fmt(tv)}</span></div>
+      <div class="row"><span>מקסימום (20%)</span><span class="mono">₪${fmt(maxLoan)}</span></div>
+      <div class="row"><span>הלוואה קיימת</span><span class="mono red">₪${fmt(p.loanAmount)}</span></div>
+      <div class="row"><span>ניתן ללוות עוד</span><span class="mono yellow">₪${fmt(canBorrow)}</span></div>
+    </div>
+    <div class="tax-notice" style="border-color:rgba(255,140,0,.3);color:var(--orange);background:rgba(255,140,0,.1)">
+      ⚠️ ריבית 8% כל 5 סיבובים. סיכון גבוה!
+    </div>
+    ${canBorrow>0?`<div class="input-group"><label>כמה ללוות?</label><input type="number" id="loan-amt" value="${Math.min(500,canBorrow)}" min="100" max="${canBorrow}" step="100"></div>
+    <div style="display:flex;gap:9px">
+      <button class="btn btn-danger full-w" onclick="takeLoan()">💸 לווה</button>
+      ${p.loanAmount>0?`<button class="btn btn-success" onclick="repayLoan()">✅ פרע</button>`:''}
+      <button class="btn btn-secondary" onclick="closeModal()">ביטול</button>
+    </div>`:`${p.loanAmount>0?`<button class="btn btn-success full-w mb-16" onclick="repayLoan()">✅ פרע הלוואה (₪${fmt(p.loanAmount)})</button>`:''}<button class="btn btn-secondary full-w" onclick="closeModal()">סגור</button>`}
+  `;openModal();
+}
+function takeLoan(){
+  const p=G.players[G.currentPlayer];const amt=parseInt(document.getElementById('loan-amt').value)||0;
+  const tv=totalValue(p,G);const canBorrow=Math.max(0,Math.round(tv*0.2)-p.loanAmount);
+  if(amt<=0||amt>canBorrow){showToast('סכום לא תקין!','red');return;}
+  p.cash+=amt;p.loanAmount+=amt;
+  G.roundActions[p.id].push({type:'loan',amount:amt});
+  showToast(`💳 קיבלת הלוואה ₪${fmt(amt)}`,'yellow');
+  saveGame();renderSidebar();closeModal();
+}
+function repayLoan(){
+  const p=G.players[G.currentPlayer];
+  if(p.cash<p.loanAmount){showToast('אין מספיק מזומן!','red');return;}
+  p.cash-=p.loanAmount;
+  G.roundActions[p.id].push({type:'repay',amount:p.loanAmount});
+  showToast('✅ פרעת את ההלוואה!','green');
+  p.loanAmount=0;saveGame();renderSidebar();closeModal();
+}
+
+function openInsuranceModal(){
+  const p=G.players[G.currentPlayer];const cost=200;
+  document.getElementById('modal-content').innerHTML=`
+    <h2>🛡️ ביטוח שוק</h2>
+    <div class="modal-info">
+      <div class="row"><span>מצב</span><span class="${p.hasInsurance?'badge-green':'badge-red'}">${p.hasInsurance?'✓ מבוטח':'✗ לא מבוטח'}</span></div>
+      <div class="row"><span>עלות</span><span class="mono">₪${fmt(cost)} ליום</span></div>
+    </div>
+    <div class="tax-notice" style="border-color:rgba(0,229,255,.3);color:var(--accent);background:rgba(0,229,255,.1)">
+      💡 ביטוח מגן על 50% מהפסדי קריסת שוק!
+    </div>
+    ${!p.hasInsurance?`<div style="display:flex;gap:9px"><button class="btn btn-primary full-w" onclick="buyInsurance()">🛡️ קנה ביטוח (₪${cost})</button><button class="btn btn-secondary" onclick="closeModal()">ביטול</button></div>`:`<button class="btn btn-secondary full-w" onclick="closeModal()">סגור</button>`}
+  `;openModal();
+}
+function buyInsurance(){
+  const p=G.players[G.currentPlayer];const cost=200;
+  if(p.cash<cost){showToast('אין מספיק מזומן!','red');return;}
+  p.cash-=cost;p.hasInsurance=true;
+  G.roundActions[p.id].push({type:'insurance',amount:cost});
+  showToast('🛡️ קנית ביטוח שוק!','green');
+  saveGame();renderSidebar();closeModal();
+}
+
+// ============================================================
+// NEWS SUBSCRIPTION — monthly (300/round) or one-time (500)
+// ============================================================
+function openNewsSubModal(){
+  const p=G.players[G.currentPlayer];
+  const futureToShow=G.futureNews.filter(fn=>fn.playerId===p.id||fn.global).slice(0,4);
+
+  let previewHTML='';
+  if(p.hasNewsSub||p.newsSubMonthly){
+    const upcoming=G.futureNews.slice(0,4);
+    if(upcoming.length===0){previewHTML=`<div class="text-muted" style="margin-top:9px">אין חדשות עתידיות ידועות כרגע</div>`;}
+    else{previewHTML=`<div style="display:flex;flex-direction:column;gap:7px;margin-top:9px">
+      ${upcoming.map(fn=>`<div style="background:var(--bg2);border-radius:8px;padding:11px;border:1px solid var(--border)">
+        <div style="font-weight:700;margin-bottom:3px;font-size:0.88rem">${fn.news.icon} ${fn.news.h}</div>
+        <div style="font-size:0.75rem;color:${fn.news.e>=0?'var(--green)':'var(--red)'}">${fn.news.e>=0?'+':''}${(fn.news.e*100).toFixed(0)}% השפעה צפויה</div>
+        <div style="font-size:0.7rem;color:var(--accent2)">יתרחש בעוד ~${fn.triggerRound-G.round} סיבובים</div>
+      </div>`).join('')}
+    </div>`;}
+  }
+
+  document.getElementById('modal-content').innerHTML=`
+    <h2>📰 חדשות מוקדמות</h2>
+    <div class="modal-info">
+      <div class="row"><span>מינוי חודשי</span><span class="${p.newsSubMonthly?'badge-green':'badge-red'}">${p.newsSubMonthly?'✓ פעיל (₪300/סיבוב)':'✗ לא פעיל'}</span></div>
+      <div class="row"><span>גישה חד-פעמית</span><span class="${p.hasNewsSub?'badge-green':'badge-red'}">${p.hasNewsSub?'✓ פעיל':'✗ לא פעיל'}</span></div>
+    </div>
+    <div class="tax-notice" style="border-color:rgba(124,58,237,.3);color:#a78bfa;background:rgba(124,58,237,.1)">
+      🔮 קבל גישה לחדשות שיקרו בעוד 1–5 סיבובים! תכנן קדימה!
+    </div>
+    ${p.hasNewsSub||p.newsSubMonthly?`<div class="section-title">🔮 חדשות עתידיות</div>${previewHTML}`:``}
+    <div style="display:flex;flex-direction:column;gap:9px;margin-top:14px">
+      ${!p.newsSubMonthly?`<button class="btn btn-secondary btn-sm" onclick="buyNewsSubMonthly()">📰 מינוי חודשי — ₪300/סיבוב (ניתן לביטול)</button>`:`<button class="btn btn-danger btn-sm" onclick="cancelNewsSubMonthly()">✕ בטל מינוי חודשי</button>`}
+      ${!p.hasNewsSub&&!p.newsSubMonthly?`<button class="btn btn-secondary btn-sm" onclick="buyNewsSubOnce()">💡 גישה חד-פעמית — ₪500</button>`:''}
+      <button class="btn btn-secondary" onclick="closeModal()">סגור</button>
+    </div>
+  `;openModal();
+}
+function buyNewsSubMonthly(){
+  const p=G.players[G.currentPlayer];
+  if(p.cash<300){showToast('אין מספיק מזומן!','red');return;}
+  p.cash-=300;p.newsSubMonthly=true;p.hasNewsSub=true;
+  G.roundActions[p.id].push({type:'newssub',amount:300});
+  showToast('📰 נרשמת למינוי חודשי!','yellow');
+  saveGame();renderSidebar();openNewsSubModal();
+}
+function cancelNewsSubMonthly(){
+  const p=G.players[G.currentPlayer];
+  p.newsSubMonthly=false;
+  showToast('✕ המינוי החודשי בוטל','yellow');
+  saveGame();renderSidebar();openNewsSubModal();
+}
+function buyNewsSubOnce(){
+  const p=G.players[G.currentPlayer];
+  if(p.cash<500){showToast('אין מספיק מזומן!','red');return;}
+  p.cash-=500;p.hasNewsSub=true;
+  G.roundActions[p.id].push({type:'newssub',amount:500});
+  showToast('💡 גישה חד-פעמית!','yellow');
+  saveGame();renderSidebar();openNewsSubModal();
+}
+
+// ============================================================
+// END TURN
+// ============================================================
+function endTurn(){
+  const p=G.players[G.currentPlayer];
+  if(G.donePlayers.includes(p.id)){showToast('כבר סיימת!','yellow');return;}
+  // Monthly news sub charge
+  if(p.newsSubMonthly){p.cash-=300;G.roundActions[p.id].push({type:'newssubbill',amount:300});}
+  // one-time resets after round
+  p.hasNewsSub=p.newsSubMonthly;
+  // Inflation
+  const inf=Math.round(p.cash*0.005);
+  if(inf>5){p.cash-=inf;showToast(`📉 אינפלציה: -₪${fmt(inf)}`,'yellow');}
+  G.donePlayers.push(p.id);
+  let nextIdx=-1;
+  for(let i=0;i<G.players.length;i++){if(!G.donePlayers.includes(G.players[i].id)){nextIdx=i;break;}}
+  if(nextIdx===-1){processRoundEnd();showSummaryScreen();}
+  else{G.currentPlayer=nextIdx;showToast(`תור של ${G.players[nextIdx].name}!`,'yellow');renderPlayerTabs();renderSidebar();renderStocks();}
+  saveGame();
+}
+
+// ============================================================
+// ROUND END
+// ============================================================
+function pickNewsForRound(round){
+  // Pick 3-5 non-future news
+  const pool=NEWS_EVENTS.filter(n=>!n.future);
+  const seed=round*7919;
+  const shuffled=[...pool].sort((a,b)=>Math.sin(seed+pool.indexOf(a))-Math.sin(seed+pool.indexOf(b)));
+  return shuffled.slice(0,3+(round%3));
+}
+
+function generateFutureNews(round){
+  const pool=NEWS_EVENTS.filter(n=>n.future);
+  const pick=pool[Math.floor(Math.random()*pool.length)];
+  const triggerRound=round+1+Math.floor(Math.random()*5);
+  if(triggerRound<=G.totalRounds){G.futureNews.push({news:pick,triggerRound});}
+}
+
+function processRoundEnd(){
+  // Save prices before change
+  COMPANIES.forEach(c=>{G.lastRoundPrices[c.id]=G.stocks[c.id];});
+
+  const news=pickNewsForRound(G.round);
+  // Check if any future news triggers this round
+  const triggeredFuture=G.futureNews.filter(fn=>fn.triggerRound===G.round);
+  const allNews=[...news,...triggeredFuture.map(fn=>fn.news)];
+  G.roundNews=allNews;
+  // Remove triggered future news
+  G.futureNews=G.futureNews.filter(fn=>fn.triggerRound!==G.round);
+  // Generate new future news
+  if(G.round<G.totalRounds-1)generateFutureNews(G.round);
+
+  // Apply price changes
+  COMPANIES.forEach(company=>{
+    let mult=1;
+    allNews.forEach(n=>{
+      if(n.c===company.id)mult+=n.e;
+      if(n.sector&&n.sector===company.category)mult+=n.e*0.5;
+      if(!n.c&&!n.sector)mult+=n.e;
+    });
+    const vol={stable:0.05,volatile:0.12,'very-volatile':0.20}[company.risk];
+    mult+=(Math.random()-.5)*2*vol;
+    mult=Math.max(0.75,Math.min(1.5,mult));
+    G.stocks[company.id]=Math.max(5,Math.round(G.stocks[company.id]*mult));
+    G.priceHistory[company.id].push(G.stocks[company.id]);
+  });
+
+  // Player end-of-round processing
+  G.players.forEach(p=>{
+    // Dividends every 3 rounds
+    if(G.round%3===0){
+      p.portfolio.forEach(h=>{
+        const co=COMPANIES.find(c=>c.id===h.id);
+        if(co&&co.risk==='stable'){
+          const div=Math.round(h.qty*G.stocks[h.id]*0.02);
+          if(div>0){p.cash+=div;G.roundActions[p.id].push({type:'dividend',company:co.name,amount:div});}
+        }
+      });
+    }
+    // Loan interest every 5 rounds
+    if(p.loanAmount>0&&G.round%5===0){
+      const int=Math.round(p.loanAmount*0.08);p.cash-=int;
+      G.roundActions[p.id].push({type:'loaninterest',amount:int});
+    }
+    // Insurance crash protection
+    if(p.hasInsurance){
+      let portfolioLoss=0;
+      p.portfolio.forEach(h=>{
+        const prev=G.lastRoundPrices[h.id]||G.stocks[h.id];
+        const loss=(prev-G.stocks[h.id])*h.qty;
+        if(loss>0)portfolioLoss+=loss;
+      });
+      if(portfolioLoss>500){
+        const protection=Math.round(portfolioLoss*0.5);
+        p.cash+=protection;
+        G.roundActions[p.id].push({type:'insurancepayout',amount:protection});
+      }
+    }
+    // Savings interest 3%
+    if(p.savings>0&&p.savingsRoundsLeft>0){
+      const int=Math.round(p.savings*0.03);p.savings+=int;
+      G.roundActions[p.id].push({type:'savingsinterest',amount:int});
+    }
+    if(p.savingsRoundsLeft>0)p.savingsRoundsLeft--;
+    // Value history
+    p.totalValueHistory.push(totalValue(p,G));
+    // Reset flags
+    p.soldThisRound=false;
+    // New quest
+    p.quest=QUESTS[Math.floor(Math.random()*QUESTS.length)];p.questDone=false;
+  });
+  saveGame();
+}
+
+// ============================================================
+// SUMMARY
+// ============================================================
+function renderSummary(){
+  document.getElementById('summary-title').textContent=`📰 סיכום יום עסקים ${G.round}`;
+  document.getElementById('summary-subtitle').textContent=`מה קרה היום בשוק? ${G.round}/${G.totalRounds} ימים`;
+
+  // News cards
+  document.getElementById('summary-news').innerHTML=G.roundNews.map(n=>{
+    const co=n.c?COMPANIES.find(c=>c.id===n.c):null;
+    const pct=(n.e*100).toFixed(0);
+    const cls=n.e>0?'change-up':n.e<0?'change-down':'change-neutral';
+    const logoHTML=co&&co.logo?`<img src="${co.logo}" style="width:36px;height:36px;object-fit:contain;background:white;border-radius:6px;padding:3px;flex-shrink:0" onerror="this.style.display='none'">`:`<span style="font-size:1.8rem">${n.icon}</span>`;
+    return `<div class="news-card">
+      <div class="news-icon">${logoHTML}</div>
+      <div class="news-body">
+        <div class="news-headline">${n.h}</div>
+        <div class="news-effect">${co?co.name:n.sector?'מגזר: '+n.sector:'כל השוק'}</div>
+        ${n.future?`<div class="news-future">⚠️ זהו אירוע שנצפה מראש על ידי מנויי חדשות!</div>`:''}
+      </div>
+      <div class="news-pct ${cls}">${n.e>0?'+':''}${pct}%</div>
+    </div>`;
+  }).join('');
+
+  // === FULL STOCKS RANKING TABLE ===
+  const ranked=[...COMPANIES].map(co=>{
+    const prev=G.lastRoundPrices&&G.lastRoundPrices[co.id]?G.lastRoundPrices[co.id]:co.basePrice;
+    const cur=G.stocks[co.id];
+    const pct=((cur-prev)/prev*100);
+    return{co,prev,cur,pct};
+  }).sort((a,b)=>b.pct-a.pct);
+
+  const ownershipMap={};
+  COMPANIES.forEach(co=>{
+    ownershipMap[co.id]=G.players.filter(p=>p.portfolio.some(h=>h.id===co.id)).map(p=>p.avatar).join('');
+  });
+
+  document.getElementById('stocks-ranking').innerHTML=`
+    <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+      <thead>
+        <tr style="background:var(--bg3);text-align:right">
+          <th style="padding:10px 12px;font-size:0.7rem;letter-spacing:1px;color:var(--text2);font-weight:700;width:32px;">#</th>
+          <th style="padding:10px 12px;font-size:0.7rem;letter-spacing:1px;color:var(--text2);font-weight:700;">חברה</th>
+          <th style="padding:10px 12px;font-size:0.7rem;letter-spacing:1px;color:var(--text2);font-weight:700;text-align:center">מגזר</th>
+          <th style="padding:10px 12px;font-size:0.7rem;letter-spacing:1px;color:var(--text2);font-weight:700;text-align:left">מחיר קודם</th>
+          <th style="padding:10px 12px;font-size:0.7rem;letter-spacing:1px;color:var(--text2);font-weight:700;text-align:left">מחיר עכשיו</th>
+          <th style="padding:10px 12px;font-size:0.7rem;letter-spacing:1px;color:var(--text2);font-weight:700;text-align:left">שינוי %</th>
+          <th style="padding:10px 12px;font-size:0.7rem;letter-spacing:1px;color:var(--text2);font-weight:700;text-align:center">מחזיקים</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${ranked.map(({co,prev,cur,pct},i)=>{
+          const up=pct>0,down=pct<0;
+          const pctColor=up?'var(--green)':down?'var(--red)':'var(--text2)';
+          const pctBg=up?'rgba(0,255,136,0.08)':down?'rgba(255,51,102,0.08)':'';
+          const pctSign=up?'+':'';
+          const arrow=up?'▲':down?'▼':'—';
+          const owners=ownershipMap[co.id];
+          const rowBg=i%2===0?'var(--card)':'var(--bg2)';
+          const logoHtml=co.logo
+            ?`<img src="${co.logo}" alt="" style="width:24px;height:24px;object-fit:contain;background:white;border-radius:4px;padding:2px;vertical-align:middle;margin-left:6px" onerror="this.outerHTML='${co.emoji}'">`
+            :`<span style="font-size:1.1rem;vertical-align:middle;margin-left:6px">${co.emoji}</span>`;
+          const rankStyle=i===0?'color:var(--green);font-weight:900':i===ranked.length-1?'color:var(--red);font-weight:900':'color:var(--text3)';
+          return `<tr style="background:${rowBg};border-bottom:1px solid var(--border);transition:background .15s" onmouseover="this.style.background='var(--card2)'" onmouseout="this.style.background='${rowBg}'">
+            <td style="padding:9px 12px;font-family:'Space Mono',monospace;font-size:0.75rem;${rankStyle}">${i+1}</td>
+            <td style="padding:9px 12px">
+              <div style="display:flex;align-items:center">
+                ${logoHtml}
+                <div>
+                  <div style="font-weight:700">${co.name}</div>
+                </div>
+              </div>
+            </td>
+            <td style="padding:9px 12px;text-align:center">
+              <span style="font-size:0.7rem;padding:2px 8px;border-radius:10px;background:var(--bg3);color:var(--text2)">${co.category}</span>
+            </td>
+            <td style="padding:9px 12px;font-family:'Space Mono',monospace;color:var(--text2);text-align:left">₪${fmt(prev)}</td>
+            <td style="padding:9px 12px;font-family:'Space Mono',monospace;font-weight:700;color:var(--accent);text-align:left">₪${fmt(cur)}</td>
+            <td style="padding:9px 12px;text-align:left">
+              <span style="font-family:'Space Mono',monospace;font-weight:700;color:${pctColor};background:${pctBg};padding:3px 8px;border-radius:6px;display:inline-block;min-width:64px;text-align:center">${arrow} ${pctSign}${pct.toFixed(1)}%</span>
+            </td>
+            <td style="padding:9px 12px;text-align:center;font-size:1rem;letter-spacing:-2px">${owners||'—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+
+    // === LEADERBOARD ===
+  const sorted=[...G.players].sort((a,b)=>totalValue(b,G)-totalValue(a,G));
+  document.getElementById('leaderboard').innerHTML=sorted.map((p,i)=>{
+    const tv=totalValue(p,G);
+    const prev=p.totalValueHistory.length>=2?p.totalValueHistory[p.totalValueHistory.length-2]:G.startCash;
+    const change=tv-prev;const pct=((change/prev)*100).toFixed(1);
+    const medals=['🥇','🥈','🥉'];
+    return `<div class="leaderboard-row">
+      <div style="font-size:1.5rem;width:30px;text-align:center">${medals[i]||(i+1)}</div>
+      <div style="font-size:1.8rem">${p.avatar}</div>
+      <div style="flex:1;font-weight:700">${p.name}</div>
+      <div style="text-align:left">
+        <div style="font-family:'Space Mono',monospace;font-size:0.85rem;color:${change>=0?'var(--green)':'var(--red)'}">${change>=0?'+':''}${pct}%</div>
+        <div style="font-family:'Space Mono',monospace;color:var(--accent);font-size:0.9rem">₪${fmt(tv)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // === MVP ===
+  const mvpPlayer=G.players.reduce((best,p)=>{
+    const tv=totalValue(p,G),prev=p.totalValueHistory.length>=2?p.totalValueHistory[p.totalValueHistory.length-2]:G.startCash;
+    const pct=(tv-prev)/prev;
+    const btv=totalValue(best,G),bprev=best.totalValueHistory.length>=2?best.totalValueHistory[best.totalValueHistory.length-2]:G.startCash;
+    return pct>(btv-bprev)/bprev?p:best;
+  });
+
+  // === PLAYER SUMMARY CARDS ===
+  document.getElementById('players-summary').innerHTML=G.players.map(p=>{
+    const tv=totalValue(p,G);
+    const prev=p.totalValueHistory.length>=2?p.totalValueHistory[p.totalValueHistory.length-2]:G.startCash;
+    const change=tv-prev,pct=((change/prev)*100).toFixed(1);
+    const isMvp=p.id===mvpPlayer.id;
+    const actions=G.roundActions[p.id]||[];
+    const stocksVal=p.portfolio.reduce((s,h)=>s+h.qty*(G.stocks[h.id]||0),0);
+
+    // FOMO detection
+    let fomoMsg='';
+    actions.forEach(a=>{
+      if(a.type==='sell'&&a.price){
+        const co=COMPANIES.find(c=>c.name===a.company);
+        if(co&&G.stocks[co.id]>a.price*1.08)fomoMsg=`😰 מכרת ${a.company} ואז היא עלתה! FOMO!`;
+      }
+    });
+
+    // Full portfolio breakdown per stock
+    const portRows=p.portfolio.map(h=>{
+      const co=COMPANIES.find(c=>c.id===h.id);
+      if(!co)return '';
+      const curP=G.stocks[h.id]||0;
+      const val=h.qty*curP;
+      const cost=h.qty*h.avgCost;
+      const pnl=val-cost;
+      const pnlClass=pnl>=0?'var(--green)':'var(--red)';
+      const logoHTML=`<img src="${co.logo}" style="width:20px;height:20px;object-fit:contain;background:white;border-radius:4px;padding:1px;vertical-align:middle;margin-left:4px" onerror="this.style.display='none'">`;
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--bg3);font-size:0.78rem">
+        <span>${logoHTML}${co.name} <span style="color:var(--text2)">×${h.qty}</span></span>
+        <span>
+          <span style="font-family:'Space Mono',monospace;color:var(--accent)">₪${fmt(val)}</span>
+          <span style="font-family:'Space Mono',monospace;color:${pnlClass};font-size:0.7rem;margin-right:4px">${pnl>=0?'+':''}₪${fmt(pnl)}</span>
+        </span>
+      </div>`;
+    }).join('');
+
+    return `<div class="player-summary-card ${isMvp?'mvp':''}">
+      ${isMvp?'<div class="mvp-badge">⭐ MVP יום</div>':''}
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="font-size:2.2rem">${p.avatar}</div>
+        <div>
+          <div style="font-weight:800;font-size:1.05rem">${p.name}</div>
+          <div style="font-family:'Space Mono',monospace;font-size:1.2rem;color:var(--accent)">₪${fmt(tv)}</div>
+        </div>
+        <div style="margin-right:auto">
+          <div class="stock-change ${change>=0?'change-up':'change-down'}" style="font-size:0.85rem">${change>=0?'+':''}${pct}%</div>
+        </div>
+      </div>
+      <div style="background:var(--bg2);border-radius:8px;padding:10px;margin-bottom:10px">
+        <div style="font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;font-weight:700">פירוט תיק</div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:0.8rem">
+          <span>💵 מזומן</span><span style="font-family:'Space Mono',monospace;color:var(--green)">₪${fmt(p.cash)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:0.8rem">
+          <span>📈 שווי מניות</span><span style="font-family:'Space Mono',monospace;color:var(--accent)">₪${fmt(stocksVal)}</span>
+        </div>
+        ${p.savings>0?`<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:0.8rem"><span>🏦 חיסכון</span><span style="font-family:'Space Mono',monospace;color:var(--accent)">₪${fmt(p.savings)}</span></div>`:''}
+        ${p.loanAmount>0?`<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:0.8rem"><span>💳 הלוואה</span><span style="font-family:'Space Mono',monospace;color:var(--red)">-₪${fmt(p.loanAmount)}</span></div>`:''}
+        <div style="display:flex;justify-content:space-between;padding:5px 0 0;font-size:0.85rem;font-weight:800;border-top:1px solid var(--border);margin-top:3px">
+          <span>🏆 סה"כ</span><span style="font-family:'Space Mono',monospace;color:var(--yellow)">₪${fmt(tv)}</span>
+        </div>
+      </div>
+      ${p.portfolio.length>0?`
+      <div style="margin-bottom:10px">
+        <div style="font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:5px;font-weight:700">מניות בתיק (${p.portfolio.length})</div>
+        ${portRows}
+      </div>`:'<div style="font-size:0.8rem;color:var(--text2);margin-bottom:10px">אין מניות בתיק</div>'}
+      <ul class="actions-log" style="margin-top:8px">
+        <div style="font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;color:var(--text2);margin-bottom:5px;font-weight:700">פעולות בסיבוב</div>
+        ${actions.length===0?'<li class="action-item"><span>לא עשה כלום...</span></li>':''}
+        ${actions.slice(0,8).map(a=>{
+          const label={buy:`📈 קנה ${a.qty||''}× ${a.company||''}`,sell:`📉 מכר ${a.qty||''}× ${a.company||''}`,deposit:'🏦 הפקיד לחיסכון',withdraw:'💰 משך מחיסכון',loan:'💳 לקח הלוואה',repay:'✅ פרע הלוואה',insurance:'🛡️ ביטוח',newssub:'📰 מינוי חדשות',newssubbill:'📰 חיוב מינוי',dividend:`💰 דיבידנד: ${a.company||''}`,loaninterest:'💸 ריבית הלוואה',savingsinterest:'📈 ריבית חיסכון +3%',quest:'🎯 משימה הושלמה!',insurancepayout:'🛡️ פיצוי ביטוח'}[a.type]||a.type;
+          const val=a.total?`₪${fmt(a.total)}`:a.amount?`₪${fmt(a.amount)}`:'';
+          return `<li class="action-item"><span class="alist-label">${label}</span><span class="alist-val">${val}</span></li>`;
+        }).join('')}
+      </ul>
+      ${fomoMsg?`<div class="fomo-tag">${fomoMsg}</div>`:''}
+    </div>`;
+  }).join('');
+
+  // Next button
+  const nextBtn=document.getElementById('next-day-btn');
+  if(G.round>=G.totalRounds){
+    nextBtn.textContent='🏁 סיום המשחק!';
+    nextBtn.onclick=()=>{G.phase='end';showEndScreen();};
+  }else{
+    nextBtn.textContent='☀️ עבור ליום העסקים הבא';
+    nextBtn.onclick=nextDay;
+  }
+}
+
+function nextDay(){
+  G.round++;G.donePlayers=[];G.currentPlayer=0;G.roundActions={};
+  G.players.forEach(p=>{G.roundActions[p.id]=[];});
+  G.phase='playing';
+  saveGame();showGameScreen();
+}
+
+// ============================================================
+// END SCREEN
+// ============================================================
+function renderEnd(){
+  const sorted=[...G.players].sort((a,b)=>totalValue(b,G)-totalValue(a,G));
+  const winner=sorted[0];
+  document.getElementById('winner-trophy').textContent=winner.avatar;
+  document.getElementById('end-title').textContent=`🏆 ${winner.name} ניצח!`;
+  document.getElementById('end-subtitle').textContent=`לאחר ${G.totalRounds} ימי עסקים — הדירוג הסופי:`;
+  document.getElementById('end-leaderboard').innerHTML=sorted.map((p,i)=>{
+    const tv=totalValue(p,G);const gain=tv-G.startCash;const pct=((gain/G.startCash)*100).toFixed(1);
+    return `<div class="leaderboard-row" style="margin-bottom:9px">
+      <div style="font-size:1.4rem">${['🥇','🥈','🥉'][i]||(i+1)}</div>
+      <div style="font-size:1.8rem">${p.avatar}</div>
+      <div style="flex:1;text-align:right"><div style="font-weight:800">${p.name}</div><div style="font-size:0.77rem;color:var(--text2)">₪${fmt(G.startCash)} → ₪${fmt(tv)}</div></div>
+      <div style="text-align:left"><div class="mono" style="font-size:1.05rem;color:var(--accent)">₪${fmt(tv)}</div><div class="mono" style="font-size:0.82rem;color:${gain>=0?'var(--green)':'var(--red)'}">${gain>=0?'+':''}${pct}%</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(){document.getElementById('modal-overlay').style.display='flex';}
+function closeModal(e){if(!e||e.target===document.getElementById('modal-overlay'))document.getElementById('modal-overlay').style.display='none';}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg,type='green'){
+  const c=document.getElementById('toast-container');
+  const t=document.createElement('div');t.className=`toast ${type}`;t.textContent=msg;
+  c.appendChild(t);setTimeout(()=>t.remove(),3100);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function fmt(n){return Math.round(n).toLocaleString('he-IL');}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded',()=>{
+  addPlayer();addPlayer();
+  const saved=localStorage.getItem('borsa_save');
+  if(saved){document.getElementById('load-btn').style.display='inline-flex';document.getElementById('reset-btn').style.display='inline-flex';}
+});
+</script>
+</body>
+</html>
